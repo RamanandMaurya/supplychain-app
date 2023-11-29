@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "630398146169",
+    "project_id": "supplychainmonitering",
+    "storage_bucket": "supplychainmonitering.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:630398146169:android:5905ee75d721b01ec966a8",
+        "android_client_info": {
+          "package_name": "com.supply_chain_monitering"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "630398146169-v172p4cbqdfhgisqc5bp8ccdbrt37kor.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEetJPpyWAY3P46cyh6KFHO0bgJffQqtA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "630398146169-v172p4cbqdfhgisqc5bp8ccdbrt37kor.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

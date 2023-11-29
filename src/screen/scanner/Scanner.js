@@ -1,0 +1,365 @@
+import {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  Image,
+  View,
+  PermissionsAndroid,
+  Alert,
+} from 'react-native';
+import React from 'react';
+import axios from 'axios';
+import QRCodeScanner from 'react-native-qrcode-scanner';
+import Header from '../../custom/Header';
+import {
+  colorConstant,
+  fontConstant,
+  baseUrl,
+  imageConstant,
+} from '../../utils/constant';
+import {width, height} from '../../dimension/dimension';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Geolocation from '@react-native-community/geolocation';
+import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
+
+export default function Scanner(props) {
+  const [scanned, setScanned] = useState(false);
+  const [qrdata, setQrData] = useState('');
+  const [longitude, setLongitude] = useState(false);
+  const [latitude, setLatitude] = useState(false);
+  const orderID = props.route.params.orderID;
+  useEffect(() => {
+    getLocation();
+  }, []);
+  // Function to get permission for location
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Geolocation Permission',
+          message: 'Can we access your location?',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      console.log('granted', granted);
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use Geolocation');
+        return true;
+      } else {
+        console.log('You cannot use Geolocation');
+        return false;
+      }
+    } catch (err) {
+      return false;
+    }
+  };
+  const getLocation = () => {
+    const result = requestLocationPermission();
+    result.then(res => {
+      console.log('results is:', res);
+      if (res) {
+        Geolocation.getCurrentPosition(
+          position => {
+            console.log(position);
+            setLongitude(position.coords.longitude);
+            setLatitude(position.coords.latitude);
+          },
+          error => {
+            console.log('## No location ##', error.code, error.message);
+            setLongitude(false);
+            setLatitude(false);
+          },
+          //{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+        );
+      }
+    });
+  };
+  const onSuccess = async e => {
+    try {
+      if (e.bounds && e.data) {
+        var resultArray = e.data.split(' ');
+        var resultString = resultArray[1].replace('Batch_No:', '').trim();
+        var resultToString = resultString.toString();
+        setQrData(resultToString);
+        sendApiRequest(resultToString);
+      }
+    } catch (err) {
+      console.error('Error setting scanned QR:', err);
+      Alert.alert('', 'The QR code has not scaned', [
+        {
+          text: 'OK',
+          onPress: () => handleScanNext(),
+        },
+      ]);
+    }
+  };
+  const sendApiRequest = async resultQrData => {
+    let url = `${baseUrl}/api/public/user/dealer-receive`;
+    const token = await AsyncStorage.getItem('TOKEN');
+    const AuthStr = 'Bearer '.concat(token);
+    let body = {
+      qrdata: resultQrData,
+      order_no: orderID,
+      lon: longitude.toString(),
+      lat: latitude.toString(),
+    };
+    try {
+      const response = await axios.post(url, body, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      });
+      console.log('API Response Success:', response.data.message);
+      if (response.data.message === 'The Order is already is in stock') {
+        Alert.alert('', 'This order is already in stock', [
+          {
+            text: 'OK',
+            onPress: () => handleScanNext(),
+          },
+        ]);
+      }
+      if (
+        response.data.message ===
+        'The Order status is currently open and will change to in stock'
+      ) {
+        setScanned(true);
+      }
+      if (response.data.message === 'Invalid QR Code') {
+        Alert.alert('', `This item does not exist in this order #${orderID}`, [
+          {
+            text: 'OK',
+            onPress: () => handleScanNext(),
+          },
+        ]);
+      }
+      if (response.data.message === 'undefined') {
+        Alert.alert(
+          '',
+          'QR code information mismatch with order. Please try again!',
+          [
+            {
+              text: 'OK',
+              onPress: () => handleScanNext(),
+            },
+          ],
+        );
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error('API Error Status:', error.response.status);
+        console.error('API Error Data:', error.response.data);
+      } else if (error.request) {
+        console.error('API No Response:', error.request);
+      } else {
+        console.error('API Error Message:', error.message);
+      }
+    }
+  };
+  const handleScanNext = () => {
+    setScanned(false);
+    scannerNode.reactivate();
+  };
+  return (
+    <SafeAreaView style={{flex: 1}}>
+      <Header
+        leftImg={imageConstant.cancel}
+        navigation={props.navigation}
+        title={'Scan Delivery'}
+      />
+      <QRCodeScanner
+        onRead={onSuccess}
+        showMarker={true}
+        reactivate={false}
+        ref={node => {
+          scannerNode = node;
+        }}
+        customMarker={
+          <Image
+            source={imageConstant.scanVector}
+            style={{
+              height: width / 1.4,
+              width: width / 1.4,
+              resizeMode: 'contain',
+              marginTop: -width / 1.5,
+            }}
+          />
+        }
+        cameraStyle={{
+          height: height,
+          width: width,
+          alignSelf: 'center',
+          justifyContent: 'center',
+        }}
+      />
+      {scanned && (
+        <View style={styles.ScanedView}>
+          <View style={styles.rowContainer}>
+            <View style={styles.leftColumnView}>
+              <View style={styles.underRowContainer}>
+                <Text style={styles.scanItemText}>Scan items</Text>
+                <Image source={imageConstant.dot} style={styles.dotImg} />
+                <Text style={styles.leftItemText}>Left 3 out of 5</Text>
+              </View>
+              <Text style={styles.subText}>
+                Order auto move to In Stock after all items are scanned
+              </Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={handleScanNext}
+              style={styles.rightColumnView}>
+              <Image source={imageConstant.scan} style={styles.scanImg} />
+              <Text style={styles.scanText}>SCAN NEXT</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.line}></View>
+          <View style={styles.rowContainer1}>
+            <View style={styles.leftColumnView}>
+              <View>
+                <Text style={styles.refernceIdText}>#{orderID}</Text>
+              </View>
+              <View style={styles.underRowContainer}>
+                <Text style={styles.scanItemText}>5 items</Text>
+                <Image source={imageConstant.dot} style={styles.dotImg} />
+                <Text style={styles.scanItemText}>1 hour ago</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={() => props.navigation.navigate('RefrenceDetails')}
+              style={styles.rightColumnView}>
+              <Image source={imageConstant.view} style={styles.scanImg} />
+              <Text style={styles.viewText}>VIEW</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.rowContainer1, {paddingTop: 5}]}>
+            <View style={styles.leftColumnView}>
+              <Text style={styles.refernceIdText}>#{qrdata}</Text>
+              <View
+                style={[
+                  styles.underRowContainer,
+                  {
+                    width: width / 2,
+                  },
+                ]}>
+                <Text
+                  style={[styles.scanItemText, {color: colorConstant.green}]}>
+                  Open
+                </Text>
+                <Image source={imageConstant.dot} style={styles.dotImg} />
+                <Text style={styles.scanItemText}>Updated 30 sec ago</Text>
+              </View>
+            </View>
+            <View style={styles.rightColumnView}>
+              <Image source={imageConstant.success} style={styles.scanImg} />
+              <Text style={[styles.viewText, {color: colorConstant.green}]}>
+                Scanned
+              </Text>
+            </View>
+          </View>
+        </View>
+      )}
+    </SafeAreaView>
+  );
+}
+const styles = StyleSheet.create({
+  rowContainer: {
+    width: width / 1.1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  rowContainer1: {
+    width: width / 1.1,
+    marginTop: width / 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    alignItems: 'center',
+  },
+  leftColumnView: {
+    width: width / 1.5,
+    flexDirection: 'column',
+    height: 45,
+  },
+  rightColumnView: {
+    alignItems: 'center',
+    width: width / 5.5,
+    flexDirection: 'column',
+  },
+  scanImg: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  scanText: {
+    color: colorConstant.button,
+    fontSize: 12,
+    fontFamily: fontConstant.semibold,
+    textAlign: 'center',
+    paddingTop: 5,
+  },
+  underRowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: width / 1.5,
+    marginTop: width / 80,
+  },
+  scanItemText: {
+    color: colorConstant.lightBlackText,
+    fontSize: 12,
+    fontFamily: fontConstant.semibold,
+  },
+  dotImg: {
+    width: 2,
+    height: 2,
+    resizeMode: 'contain',
+    paddingHorizontal: 8,
+  },
+  leftItemText: {
+    color: colorConstant.blackText,
+    fontSize: 12,
+    fontFamily: fontConstant.semibold,
+  },
+  subText: {
+    color: colorConstant.blue,
+    fontSize: 10,
+    fontFamily: fontConstant.regular,
+    marginTop: width / 40,
+  },
+  ScanedView: {
+    position: 'absolute',
+    bottom: 0,
+    backgroundColor: 'white',
+    paddingBottom: 16,
+    paddingTop: 20,
+    width: width,
+  },
+  line: {
+    height: 0.5,
+    width: width / 1.1,
+    borderWidth: 1,
+    alignSelf: 'center',
+    marginTop: width / 18,
+    borderColor: colorConstant.line,
+  },
+  viewText: {
+    color: colorConstant.lightBlackText,
+    fontSize: 12,
+    fontFamily: fontConstant.semibold,
+    textAlign: 'center',
+    paddingTop: 5,
+    textTransform: 'uppercase',
+  },
+  refernceIdText: {
+    color: colorConstant.black,
+    fontFamily: fontConstant.regular,
+    fontSize: 14,
+  },
+});
