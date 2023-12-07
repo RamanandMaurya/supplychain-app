@@ -137,7 +137,7 @@ export default function Scanner(props) {
           },
         ]);
       }
-      if (response.data.message === 'undefined') {
+      if (response.data.message === undefined) {
         Alert.alert(
           '',
           'QR code information mismatch with order. Please try again!',
