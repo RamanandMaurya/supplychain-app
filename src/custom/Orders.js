@@ -1,13 +1,14 @@
 import {
   FlatList,
   Image,
-  ImageBackground,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import React from 'react';
 import {useEffect, useState} from 'react';
 import {
   colorConstant,
@@ -15,22 +16,19 @@ import {
   imageConstant,
   fontConstant,
 } from '../utils/constant';
-import {width} from '../dimension/dimension';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {width, height} from '../dimension/dimension';
 import axios from 'axios';
-
+import {useSelector, useDispatch} from 'react-redux';
 import moment from 'moment';
-
+import {actions} from '../redux/actions/actions';
 export default function Orders({props, navigation}) {
+  const token = useSelector(state => state.reducer.userToken);
   const [allorders, setAllOrders] = useState([]);
   console.log('&&&&&&allorders', allorders);
-  console.log('@@@@###', props);
-
+  const dispatch = useDispatch();
   const allOrders = async () => {
     let url = `${baseUrl}/api/public/user/user-count/all`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
-
     axios
       .get(url, {
         headers: {
@@ -43,16 +41,34 @@ export default function Orders({props, navigation}) {
       })
       .catch(error => {
         console.log('error', error);
+        if (error) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
 
   useEffect(() => {
     allOrders();
   }, []);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  return (
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+  return allorders ? (
     <FlatList
-      // data={props.recentOrders}
+      refreshControl={
+        <RefreshControl
+          progressBackgroundColor={'#FBF6F6'}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
       data={allorders}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
@@ -139,6 +155,10 @@ export default function Orders({props, navigation}) {
         );
       }}
     />
+  ) : (
+    <View style={styles.activityIndicator}>
+      <ActivityIndicator size="large" color="#A94545" />
+    </View>
   );
 }
 
@@ -146,7 +166,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     width: width / 1.05,
     alignSelf: 'center',
-    // backgroundColor: 'red',
+    //backgroundColor: 'red',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -197,5 +217,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 3,
+  },
+  activityIndicator: {
+    marginTop: height / 3,
   },
 });

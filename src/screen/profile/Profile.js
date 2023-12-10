@@ -6,7 +6,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  RefreshControl,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -17,24 +17,18 @@ import {
 } from '../../utils/constant';
 import Header from '../../custom/Header';
 import {width} from '../../dimension/dimension';
-import {actions} from '../../redux/reducer';
-import {useDispatch} from 'react-redux';
+import {actions} from '../../redux/actions/actions';
+import {useDispatch, useSelector} from 'react-redux';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useSafeAreaFrame} from 'react-native-safe-area-context';
 import {useEffect} from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 
 export default function Profile(props, route) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [mobile, setMobile] = useState('');
-  const [role, setRole] = useState('');
-  const [address, setAddress] = useState('');
-  const [country, setCountry] = useState('');
-  const [state, setState] = useState('');
+  const token = useSelector(state => state.reducer.userToken);
+  const userProfile = useSelector(state => state.reducer.userProfile);
+  const userEdit = useSelector(state => state.reducer.userEdit);
   const [selectedImage, setSelectedImage] = useState();
-  console.log('###profileUpdate', name);
+  const dispatch = useDispatch();
   const openImagePicker = () => {
     const options = {
       mediaType: 'photo',
@@ -54,10 +48,8 @@ export default function Profile(props, route) {
       }
     });
   };
-
   const profileinfo = async () => {
     let url = `${baseUrl}/api/public/user/profile`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
     console.log('@@@@@', token);
     axios
@@ -67,31 +59,29 @@ export default function Profile(props, route) {
         },
       })
       .then(response => {
-        console.log('res', response);
-        setName(response.data.name);
-        setEmail(response.data.email);
-        setMobile(response.data.phone);
-        setRole(response.data.role);
-        setAddress(response.data.address);
-        setCountry(response.data.country);
-        setState(response.data.state);
+        const data = response.data;
+        dispatch(actions.setUserProfile(data));
         // selectedImage(response.data.profileImageURL);
       })
       .catch(error => {
         console.log('error', error);
+        if (error) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
-
   useEffect(() => {
     profileinfo();
-  }, []);
+  }, [userEdit]);
 
   //logoutapi//
 
   const logOut = async () => {
     let url = `${baseUrl}/api/public/user/logout`;
     let body = {};
-    const token = await AsyncStorage.getItem('TOKEN');
+    //const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
     axios
       .post(url, body, {
@@ -100,19 +90,30 @@ export default function Profile(props, route) {
         },
       })
       .then(response => {
-        if (response.data.message == 'successfully logout') {
-          AsyncStorage.removeItem('TOKEN');
-          AsyncStorage.removeItem('USERINFO');
-          Alert.alert('', 'Logout successfully !', [
-            {text: 'OK', onPress: () => props.navigation.navigate('Login')},
-          ]);
+        if (response.status == 200) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+          // Alert.alert('', 'Logout successfully !', [
+          //   {
+          //     text: 'OK',
+          //     onPress: () => {}
+          //   },
+          // ]);
         }
       })
       .catch(error => {
         console.log('error', error);
       });
   };
+  const [refreshing, setRefreshing] = React.useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header
@@ -123,7 +124,14 @@ export default function Profile(props, route) {
         rightNavigation={() => props.navigation.navigate('EditProfile')}
       />
 
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={'#FBF6F6'}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }>
         {selectedImage ? (
           <Image source={{uri: selectedImage}} style={styles.profileImg} />
         ) : (
@@ -136,36 +144,36 @@ export default function Profile(props, route) {
             style={styles.profileEditImg}
           />
         </TouchableOpacity>
-        <Text style={styles.titleText}>{name}</Text>
-        <Text style={styles.subText}>{role}</Text>
+        <Text style={styles.titleText}>{userProfile.name}</Text>
+        <Text style={styles.subText}>{userProfile.role}</Text>
 
         <Text style={styles.text1}>Full Name</Text>
-        <Text style={styles.text2}>{name}</Text>
+        <Text style={styles.text2}>{userProfile.name}</Text>
 
         <Text style={styles.text1}>Business Email</Text>
-        <Text style={styles.text2}>{email}</Text>
+        <Text style={styles.text2}>{userProfile.email}</Text>
 
         <Text style={styles.text1}>Mobile Number</Text>
-        <Text style={styles.text2}>{mobile}</Text>
+        <Text style={styles.text2}>{userProfile.phone}</Text>
 
         <Text style={styles.text1}>Your Role</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {role}
+          {userProfile.role}
         </Text>
 
         <Text style={styles.text1}>Address</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {address}
+          {userProfile.address}
         </Text>
 
         <Text style={styles.text1}>Country</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {country}
+          {userProfile.country}
         </Text>
 
         <Text style={styles.text1}>State</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {state}
+          {userProfile.state}
         </Text>
 
         <Text style={styles.subText1}>Do you want update your password?</Text>

@@ -10,6 +10,8 @@ import TrackDelivery from '../screen/trackDelivery/TrackDelivery';
 import ItemDetails from '../screen/itemDetails/ItemDetails';
 import RefrenceDetails from '../screen/refrenceDetails/RefrenceDetails';
 import Scanner from '../screen/scanner/Scanner';
+import EditProfile from '../screen/editProfile/EditProfile';
+import LocationEnable from '../custom/LocationEnable';
 const Stack = createNativeStackNavigator();
 
 const AfterStack = () => {
@@ -26,6 +28,8 @@ const AfterStack = () => {
       <Stack.Screen name="ItemDetails" component={ItemDetails} />
       <Stack.Screen name="RefrenceDetails" component={RefrenceDetails} />
       <Stack.Screen name="Scanner" component={Scanner} />
+      <Stack.Screen name="EditProfile" component={EditProfile} />
+      <Stack.Screen name="Location" component={LocationEnable} />
     </Stack.Navigator>
   );
 };

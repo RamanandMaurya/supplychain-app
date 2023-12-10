@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import BeforeStack from './BeforeStack';
 import AfterStack from './AfterStack';
 

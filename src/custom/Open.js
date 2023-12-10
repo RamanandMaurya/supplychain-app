@@ -1,12 +1,12 @@
 import {
   FlatList,
   Image,
-  ImageBackground,
-  SafeAreaView,
+  ActivityIndicator,
   StyleSheet,
   Text,
   View,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import React from 'react';
 import {
@@ -15,20 +15,18 @@ import {
   imageConstant,
   fontConstant,
 } from '../utils/constant';
-import {width} from '../dimension/dimension';
+import {width, height} from '../dimension/dimension';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {useSelector, useDispatch} from 'react-redux';
+import {actions} from '../redux/actions/actions';
 export default function Open({props, navigation}) {
-  // const [orders, setOrders] = useState([]);
+  const token = useSelector(state => state.reducer.userToken);
   const [status, setStatus] = useState('open');
-  const [pageNo, setPageNo] = useState('1');
-  console.log('@@@@@status', status);
-
+  const dispatch = useDispatch();
   const openOrderStatusinfo = async () => {
     let url = `${baseUrl}/api/public/user/user-count/open`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
 
     axios
@@ -43,21 +41,39 @@ export default function Open({props, navigation}) {
       })
       .catch(error => {
         console.log('error', error);
+        if (error) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
 
   useEffect(() => {
     openOrderStatusinfo();
   }, []);
-  return (
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+  return status ? (
     <FlatList
+      refreshControl={
+        <RefreshControl
+          progressBackgroundColor={'#FBF6F6'}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
       data={status}
-      // keyExtractor={item => item.order_no}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
         return (
           <View>
-            {/* <Header title={'Scan Delivery'} navigation={props.navigation} /> */}
             <View style={styles.mainContainer}>
               <View style={styles.columView1}>
                 <Text style={styles.titleText}>#{item.order_no}</Text>
@@ -111,6 +127,10 @@ export default function Open({props, navigation}) {
         );
       }}
     />
+  ) : (
+    <View style={styles.activityIndicator}>
+      <ActivityIndicator size="large" color="#A94545" />
+    </View>
   );
 }
 
@@ -192,5 +212,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 3,
+  },
+  activityIndicator: {
+    marginTop: height / 3,
   },
 });

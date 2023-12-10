@@ -9,16 +9,13 @@ import {
 } from 'react-native';
 import React, {useEffect} from 'react';
 import {colorConstant, fontConstant, imageConstant} from '../../utils/constant';
-import {height, width} from '../../dimension/dimension';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {width} from '../../dimension/dimension';
+import {useSelector} from 'react-redux';
 export default function Splash(props) {
+  const token = useSelector(state => state.reducer.userToken);
   useEffect(() => {
     setTimeout(async () => {
-      const userInfo = JSON.parse(await AsyncStorage.getItem('USERINFO'));
-      console.log('????', userInfo);
-
-      if (userInfo?.token) props.navigation.navigate('Home');
+      if (token !== null) props.navigation.navigate('Home');
       else props.navigation.navigate('Login');
     }, 2000);
   }, []);

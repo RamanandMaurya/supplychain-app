@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import {
@@ -16,20 +17,20 @@ import {
 } from '../../utils/constant';
 import {width} from '../../dimension/dimension';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import {actions} from '../../redux/actions/actions';
+import {useSelector, useDispatch} from 'react-redux';
 export default function RefrenceDetails({props, route, navigation}) {
   const {orderID, orderCount, orderTime, orderStatus} = route.params || {};
-
+  const token = useSelector(state => state.reducer.userToken);
   const [qrStatusbyno, setQrStatusByNo] = useState([]);
   const [addressDetails, setAddressDetails] = useState('');
-
+  const dispatch = useDispatch();
   console.log('!!!!!orderNo!@@@@@', orderID);
   console.log('@@@addressDetails', addressDetails);
 
   const allQrStatus = async () => {
     let url = `${baseUrl}/api/public/user/qr-order_no`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
     console.log('!!!!!token', token);
     let body = {
@@ -47,7 +48,12 @@ export default function RefrenceDetails({props, route, navigation}) {
         setAddressDetails(response.data.UserDetails);
       })
       .catch(error => {
-        console.log('apierror', error);
+        console.log('apierror2', error);
+        if (error) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
 
@@ -57,6 +63,13 @@ export default function RefrenceDetails({props, route, navigation}) {
   const openItemCount = qrStatusbyno.filter(
     item => item.order_status === 'open',
   ).length;
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView style={styles.mainView}>
       <View style={styles.rowContainerHeder}>
@@ -140,7 +153,14 @@ export default function RefrenceDetails({props, route, navigation}) {
           </View>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={'#FBF6F6'}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }>
         {/* First View */}
         <View style={[styles.rowContainer, {marginTop: width / 20}]}>
           <View style={styles.columView1}>

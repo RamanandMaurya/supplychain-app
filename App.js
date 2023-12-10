@@ -1,8 +1,6 @@
-import {View, Text} from 'react-native';
-import React, {useEffect} from 'react';
-import {NavigationContainer, useNavigation} from '@react-navigation/native';
+import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import 'react-native-gesture-handler';
-import StackRoot from './src/navigator/navigator';
 import {PersistGate} from 'redux-persist/integration/react';
 import mystore, {persistor} from './reduxStore';
 import {Provider} from 'react-redux';

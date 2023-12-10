@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import React from 'react';
 import {colorConstant, fontConstant, imageConstant} from '../../utils/constant';
@@ -13,7 +14,13 @@ import {width} from '../../dimension/dimension';
 
 export default function ItemDetails({props, route, navigation}) {
   const {orderID, Qrid, orderStatus} = route.params || {};
-  console.log(Qrid);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView style={styles.mainView}>
       <View style={styles.rowContainerHeder}>
@@ -91,7 +98,14 @@ export default function ItemDetails({props, route, navigation}) {
           </View>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={'#FBF6F6'}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }>
         <Text style={styles.headerText}>QR #{Qrid}</Text>
         <Text style={styles.disText}>
           A cement bag is a type of packaging used to store and transport
@@ -190,8 +204,24 @@ export default function ItemDetails({props, route, navigation}) {
           <View style={styles.columView}>
             <Text style={styles.firstHeaderText}>Scane 1</Text>
             <View style={styles.rowView1}>
-              <Text style={[styles.subText, {color: colorConstant.green}]}>
-                Open
+              <Text
+                style={[
+                  styles.openText,
+                  {
+                    color:
+                      orderStatus === 'open'
+                        ? colorConstant.green
+                        : orderStatus === 'in stock'
+                        ? colorConstant.orange
+                        : orderStatus === 'in transfer'
+                        ? colorConstant.blue
+                        : orderStatus === 'sold out'
+                        ? colorConstant.red
+                        : colorConstant.black,
+                    textTransform: 'uppercase',
+                  },
+                ]}>
+                {orderStatus}
               </Text>
               <Image source={imageConstant.dot} style={styles.dot} />
               <Text style={styles.timeText}>1 hour ago</Text>

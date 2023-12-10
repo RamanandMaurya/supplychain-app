@@ -25,22 +25,22 @@ const StackRoot = () => {
       initialRouteName="Splash">
       <Stack.Screen name="Splash" component={Splash} />
       <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Home" component={Home} />
+      {/* <Stack.Screen name="Home" component={Home} /> */}
       <Stack.Screen name="RecoverPassword" component={RecoverPassword} />
       <Stack.Screen name="VerifyOtp" component={VerifyOtp} />
-      <Stack.Screen name="ChangePassword" component={ChangePassword} />
-      <Stack.Screen name="EditProfile" component={EditProfile} />
+      {/* <Stack.Screen name="ChangePassword" component={ChangePassword} />
+      <Stack.Screen name="EditProfile" component={EditProfile} /> */}
       <Stack.Screen
         name="SuccessRecoverPassword"
         component={SuccessRecoverPassword}
       />
-      <Stack.Screen name="Deliveries" component={Deliveries} />
+      {/* <Stack.Screen name="Deliveries" component={Deliveries} />
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="TransferDelivery" component={TransferDelivery} />
       <Stack.Screen name="TrackDelivery" component={TrackDelivery} />
       <Stack.Screen name="ItemDetails" component={ItemDetails} />
       <Stack.Screen name="RefrenceDetails" component={RefrenceDetails} />
-      <Stack.Screen name="Scanner" component={Scanner} />
+      <Stack.Screen name="Scanner" component={Scanner} /> */}
     </Stack.Navigator>
   );
 };

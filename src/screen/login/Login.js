@@ -22,21 +22,15 @@ import InputBox from '../../custom/InputBox';
 import Button from '../../custom/Button';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-// import {useDispatch} from 'react-redux';
-// import {actions} from '../../redux/reducer';
+import {useDispatch} from 'react-redux';
+import {actions} from '../../redux/actions/actions';
 
 export default function Login(props) {
-  // const dispatch = useDispatch();
-  // const goToHome = () => {
-  //   dispatch(actions.setLoginStatus('home'));
-  // };
+  const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
-  const [info, setInfo] = useState('');
 
   const doLogin = () => {
-    // alert('doLogin');
     let url = `${baseUrl}/api/public/login`;
     console.log('doLogin URL', url);
     let body = {
@@ -50,14 +44,14 @@ export default function Login(props) {
         headers: {},
       })
       .then(async response => {
-        // alert('doLogin then RESPONSE');
-        console.log('doLogin RESPONSE', response);
+        console.log('doLogin RESPONSE', response.status);
         if (response.data.token) {
-          AsyncStorage.setItem('USERINFO', JSON.stringify(response.data));
-          AsyncStorage.setItem('TOKEN', response.data.token);
+          const userToken1 = response.data.token;
           if (response.status == 200) {
-            props.navigation.navigate('Home');
-            // alert('doLogin then Condition');
+            const data = response.data;
+            dispatch(actions.setLoginStatus('home'));
+            dispatch(actions.setUserToken(userToken1));
+            dispatch(actions.setUserInfo(data));
           }
         }
       })

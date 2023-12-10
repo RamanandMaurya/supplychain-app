@@ -1,18 +1,18 @@
 import {Alert, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import React, {useState} from 'react';
 import axios from 'axios';
-import {colorConstant, baseUrl, imageConstant} from '../../utils/constant';
+import {colorConstant, baseUrl} from '../../utils/constant';
 import Header from '../../custom/Header';
 import InputBox from '../../custom/InputBox';
 import Button from '../../custom/Button';
 import {width} from '../../dimension/dimension';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSelector} from 'react-redux';
 
 export default function ChangePassword(props) {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmpassword, setConformPassword] = useState('');
-
+  const token = useSelector(state => state.reducer.userToken);
   const changePassword = async () => {
     if (!oldPassword) {
       Alert.alert('', 'Please enter Old Password !');
@@ -43,7 +43,6 @@ export default function ChangePassword(props) {
       oldPassword: oldPassword,
       newPassword: newPassword,
     };
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
 
     axios

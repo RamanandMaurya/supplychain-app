@@ -8,7 +8,7 @@ import {
   ImageBackground,
 } from 'react-native';
 import React from 'react';
-import {width, height} from '../dimension/dimension';
+import {width} from '../dimension/dimension';
 import {imageConstant, colorConstant, fontConstant} from '../utils/constant';
 export default function ItemStatus(props) {
   console.log('@@@@', props.openOrders[0]?.count);

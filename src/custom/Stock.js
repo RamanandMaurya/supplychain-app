@@ -1,12 +1,12 @@
 import {
   FlatList,
   Image,
-  ImageBackground,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import React from 'react';
 import {
@@ -18,16 +18,16 @@ import {
 import axios from 'axios';
 import moment from 'moment';
 import {useEffect, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {width} from '../dimension/dimension';
-
+import {width, height} from '../dimension/dimension';
+import {actions} from '../redux/actions/actions';
+import {useSelector, useDispatch} from 'react-redux';
 export default function Stock(props, navigation) {
   const [inStock, setInStock] = useState('');
   console.log('@@@@@!~~~~~~', inStock);
-
+  const token = useSelector(state => state.reducer.userToken);
+  const dispatch = useDispatch();
   const inStockStatusinfo = async () => {
     let url = `${baseUrl}/api/public/user/user-count/instock`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
 
     axios
@@ -42,15 +42,33 @@ export default function Stock(props, navigation) {
       })
       .catch(error => {
         console.log('error', error);
+        if (error) {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
 
   useEffect(() => {
     inStockStatusinfo();
   }, []);
-
-  return (
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+  return inStock ? (
     <FlatList
+      refreshControl={
+        <RefreshControl
+          progressBackgroundColor={'#FBF6F6'}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+        />
+      }
       data={inStock}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
@@ -81,7 +99,6 @@ export default function Stock(props, navigation) {
                   <Text style={styles.subTitleText}> {createdAgo}</Text>
                 </View>
               </TouchableOpacity>
-
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() =>
@@ -93,12 +110,15 @@ export default function Stock(props, navigation) {
                 </View>
               </TouchableOpacity>
             </View>
-
             <View style={styles.line}></View>
           </View>
         );
       }}
     />
+  ) : (
+    <View style={styles.activityIndicator}>
+      <ActivityIndicator size="large" color="#A94545" />
+    </View>
   );
 }
 
@@ -174,5 +194,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 3,
+  },
+  activityIndicator: {
+    marginTop: height / 3,
   },
 });

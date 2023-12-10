@@ -1,5 +1,4 @@
 import {
-  FlatList,
   Image,
   ImageBackground,
   SafeAreaView,
@@ -8,9 +7,9 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
+  RefreshControl,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import axios from 'axios';
 import {
   colorConstant,
@@ -18,26 +17,21 @@ import {
   imageConstant,
   fontConstant,
 } from '../../utils/constant';
+import {useSelector, useDispatch} from 'react-redux';
+import {actions} from '../../redux/actions/actions';
 import {width, height} from '../../dimension/dimension';
 import RecentOrders from '../../custom/RecentOrder';
 import ItemStatus from '../../custom/ItemStatus';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home(props) {
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
-  const [orderSummary, setOrderSummary] = useState({});
-  const [recentOrders, setRecentOrders] = useState({});
-  console.log('orderSummary', orderSummary);
-
+  const token = useSelector(state => state.reducer.userToken);
+  const userProfile = useSelector(state => state.reducer.userProfile);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
+  const dashboardData = useSelector(state => state.reducer.dashboardData);
+  const dispatch = useDispatch();
   const homepageApi = async () => {
     let url = `${baseUrl}/api/public/user/order-count`;
-    const userInfo = JSON.parse(await AsyncStorage.getItem('USERINFO'));
-    setName(userInfo.userInfo.name);
-    setRole(userInfo.userInfo.role);
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
-
     axios
       .get(url, {
         headers: {
@@ -45,19 +39,29 @@ export default function Home(props) {
         },
       })
       .then(response => {
-        console.log('>>>>>@@@@@@@@@@@@@@@@ordercount ', response.data);
-        setOrderSummary(response.data.Count);
-        setRecentOrders(response.data.Recent);
+        dispatch(actions.setDashboardData(response.data));
       })
       .catch(error => {
         console.log(error);
+        if (error.response.data.error === 'Token is expired') {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
 
   useEffect(() => {
     homepageApi();
-  }, []);
+  }, [token, userProfile, dataScaned]);
+  const [refreshing, setRefreshing] = React.useState(false);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <SafeAreaView>
       <View style={styles.mainView}>
@@ -73,15 +77,16 @@ export default function Home(props) {
           onPress={() => props.navigation.navigate('Profile')}>
           <Image source={imageConstant.profile} style={styles.profileImg} />
           <View style={styles.columView}>
-            <Text style={styles.titleText}>{name}</Text>
+            <Text style={styles.titleText}>{userProfile.name}</Text>
             <Text style={(styles.subTitleText, styles.textTransformText)}>
-              {role}
+              {userProfile.role}
             </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
           //onPress={() => Alert.alert('Notification', 'Empty')}
+          //onPress={() => props.navigation.navigate('Location')}
         >
           <ImageBackground
             source={imageConstant.notification}
@@ -90,9 +95,17 @@ export default function Home(props) {
           </ImageBackground>
         </TouchableOpacity>
       </View>
-      <ScrollView style={{height: height}}>
+      <ScrollView
+        style={{height: height}}
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={'#FBF6F6'}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }>
         <ItemStatus
-          openOrders={orderSummary}
+          openOrders={dashboardData.Count}
           OpenNavigation={() =>
             props.navigation.navigate('Deliveries', {
               Open: 'Open',
@@ -119,14 +132,9 @@ export default function Home(props) {
             })
           }
         />
-
         <Text style={styles.recentText}>Recent Orders</Text>
         <Text style={styles.subText}>Track your order in real time</Text>
-        <RecentOrders
-          recentOrders={recentOrders}
-          //navigation={() => props.navigation.navigate('Deliveries')}
-          navigation={props}
-        />
+        <RecentOrders recentOrders={dashboardData.Recent} navigation={props} />
         <View style={{height: 50}}></View>
       </ScrollView>
 
@@ -146,7 +154,6 @@ export default function Home(props) {
 
 const styles = StyleSheet.create({
   mainView: {
-    // backgroundColor: colorConstant.white,
     width: width,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -155,7 +162,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    // padding: width / 20,
   },
   profileImg: {
     resizeMode: 'contain',

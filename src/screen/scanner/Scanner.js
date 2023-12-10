@@ -13,6 +13,7 @@ import React from 'react';
 import axios from 'axios';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import Header from '../../custom/Header';
+import {actions} from '../../redux/actions/actions';
 import {
   colorConstant,
   fontConstant,
@@ -20,16 +21,23 @@ import {
   imageConstant,
 } from '../../utils/constant';
 import {width, height} from '../../dimension/dimension';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Geolocation from '@react-native-community/geolocation';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
-
+import Permissions, {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+} from 'react-native-permissions';
+import {useSelector, useDispatch} from 'react-redux';
 export default function Scanner(props) {
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [scanned, setScanned] = useState(false);
   const [qrdata, setQrData] = useState('');
   const [longitude, setLongitude] = useState(false);
   const [latitude, setLatitude] = useState(false);
   const orderID = props.route.params.orderID;
+  const token = useSelector(state => state.reducer.userToken);
+  const dispatch = useDispatch();
   useEffect(() => {
     getLocation();
   }, []);
@@ -100,7 +108,6 @@ export default function Scanner(props) {
   };
   const sendApiRequest = async resultQrData => {
     let url = `${baseUrl}/api/public/user/dealer-receive`;
-    const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
     let body = {
       qrdata: resultQrData,
@@ -127,6 +134,7 @@ export default function Scanner(props) {
         response.data.message ===
         'The Order status is currently open and will change to in stock'
       ) {
+        dispatch(actions.setDataScaned(dataScaned ? false : true));
         setScanned(true);
       }
       if (response.data.message === 'Invalid QR Code') {
@@ -155,6 +163,9 @@ export default function Scanner(props) {
         console.error('API Error Data:', error.response.data);
       } else if (error.request) {
         console.error('API No Response:', error.request);
+        dispatch(actions.setUserToken(null));
+        dispatch(actions.setLoginStatus(null));
+        dispatch(actions.setUserInfo(null));
       } else {
         console.error('API Error Message:', error.message);
       }
@@ -231,7 +242,13 @@ export default function Scanner(props) {
             </View>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => props.navigation.navigate('RefrenceDetails')}
+              onPress={() =>
+                props.navigation.navigate('ItemDetails', {
+                  orderID: orderID,
+                  Qrid: qrdata,
+                  orderStatus: 'in stock',
+                })
+              }
               style={styles.rightColumnView}>
               <Image source={imageConstant.view} style={styles.scanImg} />
               <Text style={styles.viewText}>VIEW</Text>

@@ -1,58 +1,21 @@
 import {
   FlatList,
   Image,
-  ImageBackground,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useEffect, useState} from 'react';
-import {
-  colorConstant,
-  baseUrl,
-  imageConstant,
-  fontConstant,
-} from '../utils/constant';
+import {colorConstant, imageConstant, fontConstant} from '../utils/constant';
+import {useSelector} from 'react-redux';
 import {width} from '../dimension/dimension';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-
 import moment from 'moment';
 
-export default function RecentOrders({props, navigation}) {
-  const [recentorder, setRecentOrder] = useState([]);
-  console.log('@@recentorder', recentorder);
-
-  const recentOrders = async () => {
-    let url = `${baseUrl}/api/public/user/order-count`;
-    const token = await AsyncStorage.getItem('TOKEN');
-    const AuthStr = 'Bearer '.concat(token);
-    console.log('token', token);
-
-    axios
-      .get(url, {
-        headers: {
-          Authorization: AuthStr,
-        },
-      })
-      .then(response => {
-        console.log('@@@@@@@@recentpage', response);
-        setRecentOrder(response.data.Recent);
-      })
-      .catch(error => {
-        console.log('error', error);
-      });
-  };
-
-  useEffect(() => {
-    recentOrders();
-  }, []);
+export default function RecentOrders({navigation}) {
+  const dashboardData = useSelector(state => state.reducer.dashboardData);
   return (
     <FlatList
-      //data={props.recentOrders}
-      data={recentorder}
+      data={dashboardData.Recent}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
         return (
