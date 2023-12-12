@@ -91,9 +91,10 @@ export default function EditProfile(props) {
       <KeyboardAwareScrollView
         refreshControl={
           <RefreshControl
-            progressBackgroundColor={'#FBF6F6'}
+            progressBackgroundColor={'#ffffff'}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            colors={['#A94545']}
           />
         }>
         <InputBox

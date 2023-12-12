@@ -23,7 +23,7 @@ import axios from 'axios';
 import {useEffect} from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 
-export default function Profile(props, route) {
+export default function Profile(props) {
   const token = useSelector(state => state.reducer.userToken);
   const userProfile = useSelector(state => state.reducer.userProfile);
   const userEdit = useSelector(state => state.reducer.userEdit);
@@ -61,7 +61,6 @@ export default function Profile(props, route) {
       .then(response => {
         const data = response.data;
         dispatch(actions.setUserProfile(data));
-        // selectedImage(response.data.profileImageURL);
       })
       .catch(error => {
         console.log('error', error);
@@ -77,11 +76,15 @@ export default function Profile(props, route) {
   }, [userEdit]);
 
   //logoutapi//
+  const logOutRemoveData = () => {
+    dispatch(actions.setUserToken(null));
+    dispatch(actions.setLoginStatus(null));
+    dispatch(actions.setUserInfo(null));
+  };
 
   const logOut = async () => {
     let url = `${baseUrl}/api/public/user/logout`;
     let body = {};
-    //const token = await AsyncStorage.getItem('TOKEN');
     const AuthStr = 'Bearer '.concat(token);
     axios
       .post(url, body, {
@@ -91,9 +94,7 @@ export default function Profile(props, route) {
       })
       .then(response => {
         if (response.status == 200) {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
+          logOutRemoveData();
           // Alert.alert('', 'Logout successfully !', [
           //   {
           //     text: 'OK',
@@ -127,9 +128,10 @@ export default function Profile(props, route) {
       <ScrollView
         refreshControl={
           <RefreshControl
-            progressBackgroundColor={'#FBF6F6'}
+            progressBackgroundColor={'#ffffff'}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            colors={['#A94545']}
           />
         }>
         {selectedImage ? (
@@ -144,36 +146,36 @@ export default function Profile(props, route) {
             style={styles.profileEditImg}
           />
         </TouchableOpacity>
-        <Text style={styles.titleText}>{userProfile.name}</Text>
-        <Text style={styles.subText}>{userProfile.role}</Text>
+        <Text style={styles.titleText}>{userProfile?.name}</Text>
+        <Text style={styles.subText}>{userProfile?.role}</Text>
 
         <Text style={styles.text1}>Full Name</Text>
-        <Text style={styles.text2}>{userProfile.name}</Text>
+        <Text style={styles.text2}>{userProfile?.name}</Text>
 
         <Text style={styles.text1}>Business Email</Text>
-        <Text style={styles.text2}>{userProfile.email}</Text>
+        <Text style={styles.text2}>{userProfile?.email}</Text>
 
         <Text style={styles.text1}>Mobile Number</Text>
-        <Text style={styles.text2}>{userProfile.phone}</Text>
+        <Text style={styles.text2}>{userProfile?.phone}</Text>
 
         <Text style={styles.text1}>Your Role</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {userProfile.role}
+          {userProfile?.role}
         </Text>
 
         <Text style={styles.text1}>Address</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {userProfile.address}
+          {userProfile?.address}
         </Text>
 
         <Text style={styles.text1}>Country</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {userProfile.country}
+          {userProfile?.country}
         </Text>
 
         <Text style={styles.text1}>State</Text>
         <Text style={[styles.text2, {textTransform: 'capitalize'}]}>
-          {userProfile.state}
+          {userProfile?.state}
         </Text>
 
         <Text style={styles.subText1}>Do you want update your password?</Text>

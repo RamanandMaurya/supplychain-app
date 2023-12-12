@@ -66,6 +66,12 @@ export default function ChangePassword(props) {
           Alert.alert('', 'Old password not matched, Try again');
           return;
         }
+        console.log('apierror', error.response.data.error); // Log the response data for more details
+        if (error.response.data.error === 'Token is expired') {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
       });
   };
   return (

@@ -45,6 +45,21 @@ export default function parentFlowReducer(
         ...state,
         dashboardData: action.payload.dashboardData,
       };
+    case types.OPEN_ITEMS:
+      return {
+        ...state,
+        openItems: action.payload.openItems,
+      };
+    case types.INSTOCK_ITEMS:
+      return {
+        ...state,
+        instockItems: action.payload.instockItems,
+      };
+    case types.ALL_ORDERS:
+      return {
+        ...state,
+        allOrders: action.payload.allOrders,
+      };
 
     default:
       return state;

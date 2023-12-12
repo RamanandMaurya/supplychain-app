@@ -21,10 +21,10 @@ import axios from 'axios';
 import {useSelector, useDispatch} from 'react-redux';
 import moment from 'moment';
 import {actions} from '../redux/actions/actions';
-export default function Orders({props, navigation}) {
+export default function Orders({navigation}) {
   const token = useSelector(state => state.reducer.userToken);
-  const [allorders, setAllOrders] = useState([]);
-  console.log('&&&&&&allorders', allorders);
+  const allOrders1 = useSelector(state => state.reducer.allOrders);
+  const [allorders2, setAllOrders2] = useState();
   const dispatch = useDispatch();
   const allOrders = async () => {
     let url = `${baseUrl}/api/public/user/user-count/all`;
@@ -36,8 +36,8 @@ export default function Orders({props, navigation}) {
         },
       })
       .then(response => {
-        console.log('@@@@@@@@orderRes', response.data);
-        setAllOrders(response.data);
+        setAllOrders2(response?.data);
+        dispatch(actions.setAllOrders(response?.data));
       })
       .catch(error => {
         console.log('error', error);
@@ -51,7 +51,7 @@ export default function Orders({props, navigation}) {
 
   useEffect(() => {
     allOrders();
-  }, []);
+  }, [token]);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
@@ -60,16 +60,18 @@ export default function Orders({props, navigation}) {
       setRefreshing(false);
     }, 2000);
   }, []);
-  return allorders ? (
+  return allorders2 ? (
     <FlatList
+      style={{marginTop: 35}}
       refreshControl={
         <RefreshControl
-          progressBackgroundColor={'#FBF6F6'}
+          progressBackgroundColor={'#ffffff'}
           refreshing={refreshing}
           onRefresh={onRefresh}
+          colors={['#A94545']}
         />
       }
-      data={allorders}
+      data={allorders2}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
         return (
@@ -182,9 +184,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   line: {
-    height: 0.5,
     width: width / 1.1,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     alignSelf: 'center',
     marginTop: width / 40,
     borderColor: colorConstant.line,
@@ -219,6 +220,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   activityIndicator: {
-    marginTop: height / 3,
+    marginTop: height / 2.3,
   },
 });

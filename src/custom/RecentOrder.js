@@ -1,11 +1,5 @@
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {useState, useEffect} from 'react';
 import {colorConstant, imageConstant, fontConstant} from '../utils/constant';
 import {useSelector} from 'react-redux';
 import {width} from '../dimension/dimension';
@@ -13,13 +7,12 @@ import moment from 'moment';
 
 export default function RecentOrders({navigation}) {
   const dashboardData = useSelector(state => state.reducer.dashboardData);
-  return (
-    <FlatList
-      data={dashboardData.Recent}
-      renderItem={({item}) => {
+  const recentOreder = dashboardData?.Recent;
+  return recentOreder
+    ? recentOreder.map((item, key) => {
         const createdAgo = moment(item.created_at).fromNow();
         return (
-          <View>
+          <View key={key}>
             <TouchableOpacity
               activeOpacity={0.7}
               style={styles.mainContainer}
@@ -99,9 +92,8 @@ export default function RecentOrders({navigation}) {
             <View style={styles.line}></View>
           </View>
         );
-      }}
-    />
-  );
+      })
+    : null;
 }
 
 const styles = StyleSheet.create({
@@ -124,9 +116,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   line: {
-    height: 0.5,
     width: width / 1.1,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     alignSelf: 'center',
     marginTop: width / 40,
     borderColor: colorConstant.line,

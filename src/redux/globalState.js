@@ -7,5 +7,8 @@ export default {
     userEdit: false,
     dataScaned: false,
     dashboardData: null,
+    openItems: null,
+    instockItems: null,
+    allOrders: null,
   },
 };

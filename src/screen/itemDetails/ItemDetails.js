@@ -101,9 +101,10 @@ export default function ItemDetails({props, route, navigation}) {
       <ScrollView
         refreshControl={
           <RefreshControl
-            progressBackgroundColor={'#FBF6F6'}
+            progressBackgroundColor={'#ffffff'}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            colors={['#A94545']}
           />
         }>
         <Text style={styles.headerText}>QR #{Qrid}</Text>

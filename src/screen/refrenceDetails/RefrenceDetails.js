@@ -26,8 +26,6 @@ export default function RefrenceDetails({props, route, navigation}) {
   const [qrStatusbyno, setQrStatusByNo] = useState([]);
   const [addressDetails, setAddressDetails] = useState('');
   const dispatch = useDispatch();
-  console.log('!!!!!orderNo!@@@@@', orderID);
-  console.log('@@@addressDetails', addressDetails);
 
   const allQrStatus = async () => {
     let url = `${baseUrl}/api/public/user/qr-order_no`;
@@ -156,9 +154,10 @@ export default function RefrenceDetails({props, route, navigation}) {
       <ScrollView
         refreshControl={
           <RefreshControl
-            progressBackgroundColor={'#FBF6F6'}
+            progressBackgroundColor={'#ffffff'}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            colors={['#A94545']}
           />
         }>
         {/* First View */}

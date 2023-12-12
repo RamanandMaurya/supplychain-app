@@ -21,7 +21,6 @@ import {width, height} from '../../dimension/dimension';
 import InputBox from '../../custom/InputBox';
 import Button from '../../custom/Button';
 import {useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {actions} from '../../redux/actions/actions';
 
@@ -44,11 +43,11 @@ export default function Login(props) {
         headers: {},
       })
       .then(async response => {
-        console.log('doLogin RESPONSE', response.status);
-        if (response.data.token) {
-          const userToken1 = response.data.token;
-          if (response.status == 200) {
-            const data = response.data;
+        console.log('doLogin RESPONSE', response?.status);
+        if (response?.data?.token) {
+          const userToken1 = response?.data?.token;
+          if (response?.status == 200) {
+            const data = response?.data;
             dispatch(actions.setLoginStatus('home'));
             dispatch(actions.setUserToken(userToken1));
             dispatch(actions.setUserInfo(data));
@@ -57,37 +56,16 @@ export default function Login(props) {
       })
       .catch(error => {
         console.log('doLogin ERROR', error);
-        if (error.response.data.error == 'email does not exist') {
-          Alert.alert('', error.response.data.developerInfo);
+        if (error?.response?.data?.error == 'email does not exist') {
+          Alert.alert('', error?.response?.data?.developerInfo);
           return;
         }
-        if (error.response.data.error == 'password not matched') {
-          Alert.alert('', error.response.data.developerInfo);
+        if (error?.response?.data?.error == 'password not matched') {
+          Alert.alert('', error?.response?.data?.developerInfo);
           return;
         }
       });
   };
-
-  // const getAPI = () => {
-  //   let url = `${baseUrl}/api/public/user/dashboard`;
-  //   const AuthStr = 'Bearer '.concat(
-  //     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImRldmljZUlkIjoiIiwiZW1haWwiOiJoYXJpc2gxMkBnbWFpbC5jb20iLCJleHBpcmVzQXQiOiIyMDIzLTA5LTIzIDE5OjE2OjQxLjIzOTAzNjM2OSArMDAwMCBVVEMgbT0rMzM5NTcuNzM5MzE0NzcxIiwiaWQiOiI1IiwiaXNzdWVyIjoiNSIsIm1vZGVsTmFtZSI6IiIsIm5hbWUiOiJoYXJpc2giLCJvU1ZlcnNpb24iOiIiLCJwbGF0Zm9ybSI6IiIsInJvbGUiOiJkZWFsZXIiLCJ1c2VybmFtZSI6ImhhcmlzaCIsInV1aWRUb2tlbiI6IjNiYzU4NjBmLThhYWItNDhhZS04MGRhLTBlNjUxNDhkY2M5YiJ9LCJleHAiOjE2OTU0OTY2MDEsImlzcyI6IjUifQ.Fe02lmWPqho59vpQuaxpQ3X-QG4Lk9ahFH46Kc7DlpI',
-  //   );
-
-  //   axios
-  //     .get(url, {
-  //       headers: {
-  //         Authorization: AuthStr,
-  //       },
-  //     })
-  //     .then(response => {
-  //       console.log('!!!!! ', response.data);
-  //     })
-  //     .catch(error => {
-  //       console.log(error);
-  //     });
-  // };
-
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView>
@@ -95,7 +73,7 @@ export default function Login(props) {
           style={{
             justifyContent: 'center',
             alignSelf: 'center',
-            height: height,
+            height: height - 15,
           }}>
           <Image source={imageConstant.logo} style={styles.logoImg} />
 
@@ -165,9 +143,8 @@ const styles = StyleSheet.create({
   needhelp: {
     color: colorConstant.lightGray,
     alignSelf: 'center',
-
     fontFamily: fontConstant.medium,
-    bottom: width / 20,
+    bottom: 10,
     position: 'absolute',
   },
   conactus: {

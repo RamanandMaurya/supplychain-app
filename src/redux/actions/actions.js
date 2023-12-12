@@ -42,4 +42,22 @@ export const actions = {
       payload: {dashboardData: dashboardData},
     };
   },
+  setOpenItems: openItems => {
+    return {
+      type: types.OPEN_ITEMS,
+      payload: {openItems: openItems},
+    };
+  },
+  setInstockItems: instockItems => {
+    return {
+      type: types.INSTOCK_ITEMS,
+      payload: {instockItems: instockItems},
+    };
+  },
+  setAllOrders: allOrders => {
+    return {
+      type: types.ALL_ORDERS,
+      payload: {allOrders: allOrders},
+    };
+  },
 };

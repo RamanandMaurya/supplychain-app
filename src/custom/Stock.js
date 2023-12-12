@@ -21,10 +21,10 @@ import {useEffect, useState} from 'react';
 import {width, height} from '../dimension/dimension';
 import {actions} from '../redux/actions/actions';
 import {useSelector, useDispatch} from 'react-redux';
-export default function Stock(props, navigation) {
-  const [inStock, setInStock] = useState('');
-  console.log('@@@@@!~~~~~~', inStock);
+export default function Stock(props) {
+  const [inStock, setInStock] = useState();
   const token = useSelector(state => state.reducer.userToken);
+  const instockItems = useSelector(state => state.reducer.instockItems);
   const dispatch = useDispatch();
   const inStockStatusinfo = async () => {
     let url = `${baseUrl}/api/public/user/user-count/instock`;
@@ -37,8 +37,8 @@ export default function Stock(props, navigation) {
         },
       })
       .then(response => {
-        console.log('@@@@@@@@instockRes', response.data);
-        setInStock(response.data);
+        setInStock(response?.data);
+        dispatch(actions.setInstockItems(response?.data));
       })
       .catch(error => {
         console.log('error', error);
@@ -52,7 +52,7 @@ export default function Stock(props, navigation) {
 
   useEffect(() => {
     inStockStatusinfo();
-  }, []);
+  }, [token]);
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -62,11 +62,13 @@ export default function Stock(props, navigation) {
   }, []);
   return inStock ? (
     <FlatList
+      style={{marginTop: 35}}
       refreshControl={
         <RefreshControl
-          progressBackgroundColor={'#FBF6F6'}
+          progressBackgroundColor={'#ffffff'}
           refreshing={refreshing}
           onRefresh={onRefresh}
+          colors={['#A94545']}
         />
       }
       data={inStock}
@@ -126,7 +128,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     width: width / 1.05,
     alignSelf: 'center',
-    // backgroundColor: 'red',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -142,9 +143,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   line: {
-    height: 0.5,
     width: width / 1.1,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     alignSelf: 'center',
     marginTop: width / 40,
     borderColor: colorConstant.line,
@@ -196,6 +196,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   activityIndicator: {
-    marginTop: height / 3,
+    marginTop: height / 2.3,
   },
 });

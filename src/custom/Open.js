@@ -21,14 +21,14 @@ import {useEffect, useState} from 'react';
 import moment from 'moment';
 import {useSelector, useDispatch} from 'react-redux';
 import {actions} from '../redux/actions/actions';
-export default function Open({props, navigation}) {
+export default function Open({navigation}) {
   const token = useSelector(state => state.reducer.userToken);
-  const [status, setStatus] = useState('open');
+  const openItems = useSelector(state => state.reducer.openItems);
+  const [status, setStatus] = useState();
   const dispatch = useDispatch();
   const openOrderStatusinfo = async () => {
     let url = `${baseUrl}/api/public/user/user-count/open`;
     const AuthStr = 'Bearer '.concat(token);
-
     axios
       .get(url, {
         headers: {
@@ -36,8 +36,8 @@ export default function Open({props, navigation}) {
         },
       })
       .then(response => {
-        console.log('@@@@@@@@res', response.data);
-        setStatus(response.data);
+        setStatus(response?.data);
+        dispatch(actions.setOpenItems(response?.data));
       })
       .catch(error => {
         console.log('error', error);
@@ -51,9 +51,9 @@ export default function Open({props, navigation}) {
 
   useEffect(() => {
     openOrderStatusinfo();
-  }, []);
-  const [refreshing, setRefreshing] = React.useState(false);
+  }, [token]);
 
+  const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
@@ -62,11 +62,13 @@ export default function Open({props, navigation}) {
   }, []);
   return status ? (
     <FlatList
+      style={{marginTop: 35}}
       refreshControl={
         <RefreshControl
-          progressBackgroundColor={'#FBF6F6'}
+          progressBackgroundColor={'#ffffff'}
           refreshing={refreshing}
           onRefresh={onRefresh}
+          colors={['#A94545']}
         />
       }
       data={status}
@@ -138,7 +140,6 @@ const styles = StyleSheet.create({
   mainContainer: {
     width: width / 1.05,
     alignSelf: 'center',
-    // backgroundColor: 'red',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -154,9 +155,8 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   line: {
-    height: 0.5,
     width: width / 1.1,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     alignSelf: 'center',
     marginTop: width / 40,
     borderColor: colorConstant.line,
@@ -214,6 +214,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   activityIndicator: {
-    marginTop: height / 3,
+    marginTop: height / 2.3,
   },
 });

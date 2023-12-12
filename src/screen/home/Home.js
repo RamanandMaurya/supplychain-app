@@ -9,7 +9,7 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {
   colorConstant,
@@ -22,12 +22,16 @@ import {actions} from '../../redux/actions/actions';
 import {width, height} from '../../dimension/dimension';
 import RecentOrders from '../../custom/RecentOrder';
 import ItemStatus from '../../custom/ItemStatus';
+import Profile from '../profile/Profile';
 
 export default function Home(props) {
   const token = useSelector(state => state.reducer.userToken);
   const userProfile = useSelector(state => state.reducer.userProfile);
   const dataScaned = useSelector(state => state.reducer.dataScaned);
   const dashboardData = useSelector(state => state.reducer.dashboardData);
+  const [name, setName] = useState();
+  const [role, setRole] = useState();
+  const [reloadProfile, setReloadProfile] = useState(false);
   const dispatch = useDispatch();
   const homepageApi = async () => {
     let url = `${baseUrl}/api/public/user/order-count`;
@@ -39,7 +43,9 @@ export default function Home(props) {
         },
       })
       .then(response => {
-        dispatch(actions.setDashboardData(response.data));
+        dispatch(actions.setDashboardData(response?.data));
+        setName(userProfile?.name);
+        setRole(userProfile?.role);
       })
       .catch(error => {
         console.log(error);
@@ -49,8 +55,8 @@ export default function Home(props) {
           dispatch(actions.setUserInfo(null));
         }
       });
+    setReloadProfile(true);
   };
-
   useEffect(() => {
     homepageApi();
   }, [token, userProfile, dataScaned]);
@@ -64,6 +70,7 @@ export default function Home(props) {
   }, []);
   return (
     <SafeAreaView>
+      {reloadProfile && <Profile />}
       <View style={styles.mainView}>
         <TouchableOpacity
           activeOpacity={0.7}
@@ -77,17 +84,16 @@ export default function Home(props) {
           onPress={() => props.navigation.navigate('Profile')}>
           <Image source={imageConstant.profile} style={styles.profileImg} />
           <View style={styles.columView}>
-            <Text style={styles.titleText}>{userProfile.name}</Text>
+            <Text style={styles.titleText}>{name}</Text>
             <Text style={(styles.subTitleText, styles.textTransformText)}>
-              {userProfile.role}
+              {role}
             </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
           //onPress={() => Alert.alert('Notification', 'Empty')}
-          //onPress={() => props.navigation.navigate('Location')}
-        >
+          onPress={() => props.navigation.navigate('Location')}>
           <ImageBackground
             source={imageConstant.notification}
             style={styles.notification}>
@@ -99,13 +105,14 @@ export default function Home(props) {
         style={{height: height}}
         refreshControl={
           <RefreshControl
-            progressBackgroundColor={'#FBF6F6'}
+            progressBackgroundColor={'#ffffff'}
             refreshing={refreshing}
             onRefresh={onRefresh}
+            colors={['#A94545']}
           />
         }>
         <ItemStatus
-          openOrders={dashboardData.Count}
+          openOrders={dashboardData?.Count}
           OpenNavigation={() =>
             props.navigation.navigate('Deliveries', {
               Open: 'Open',
@@ -134,7 +141,7 @@ export default function Home(props) {
         />
         <Text style={styles.recentText}>Recent Orders</Text>
         <Text style={styles.subText}>Track your order in real time</Text>
-        <RecentOrders recentOrders={dashboardData.Recent} navigation={props} />
+        <RecentOrders recentOrders={dashboardData?.Recent} navigation={props} />
         <View style={{height: 50}}></View>
       </ScrollView>
 

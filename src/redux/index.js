@@ -5,3 +5,6 @@ export const USER_PROFILE = 'USER_PROFILE';
 export const USER_EDIT = 'USER_EDIT';
 export const DATA_SCANED = 'DATA_SCANED';
 export const DASHBOARD_DATA = 'DASHBOARD_DATA';
+export const OPEN_ITEMS = 'OPEN_ITEMS';
+export const INSTOCK_ITEMS = 'INSTOCK_ITEMS';
+export const ALL_ORDERS = 'ALL_ORDERS';

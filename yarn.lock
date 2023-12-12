@@ -6273,11 +6273,6 @@ react-native-keyboard-aware-scroll-view@^0.9.5:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
-react-native-location-enabler@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.npmjs.org/react-native-location-enabler/-/react-native-location-enabler-4.1.1.tgz"
-  integrity sha512-1gXJ+NzH5JKpaR23t1P8afEB7TKKfBkdXk2avhNUuTBlhBrqa2HrL4uDwYHoc4ZcwchsVC2P0Q7gP9L5Ot+KJw==
-
 react-native-permissions@^2.0.2:
   version "2.2.2"
   resolved "https://registry.npmjs.org/react-native-permissions/-/react-native-permissions-2.2.2.tgz"
