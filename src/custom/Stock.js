@@ -24,6 +24,7 @@ import {useSelector, useDispatch} from 'react-redux';
 export default function Stock(props) {
   const [inStock, setInStock] = useState();
   const token = useSelector(state => state.reducer.userToken);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
   const instockItems = useSelector(state => state.reducer.instockItems);
   const dispatch = useDispatch();
   const inStockStatusinfo = async () => {
@@ -41,8 +42,8 @@ export default function Stock(props) {
         dispatch(actions.setInstockItems(response?.data));
       })
       .catch(error => {
-        console.log('error', error);
-        if (error) {
+        console.log('error', error.response.data.error);
+        if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
@@ -52,7 +53,7 @@ export default function Stock(props) {
 
   useEffect(() => {
     inStockStatusinfo();
-  }, [token]);
+  }, [token, dataScaned]);
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);

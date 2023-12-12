@@ -24,6 +24,7 @@ import {actions} from '../redux/actions/actions';
 export default function Open({navigation}) {
   const token = useSelector(state => state.reducer.userToken);
   const openItems = useSelector(state => state.reducer.openItems);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [status, setStatus] = useState();
   const dispatch = useDispatch();
   const openOrderStatusinfo = async () => {
@@ -40,8 +41,8 @@ export default function Open({navigation}) {
         dispatch(actions.setOpenItems(response?.data));
       })
       .catch(error => {
-        console.log('error', error);
-        if (error) {
+        console.log('error--', error.response.data.error);
+        if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
@@ -51,7 +52,7 @@ export default function Open({navigation}) {
 
   useEffect(() => {
     openOrderStatusinfo();
-  }, [token]);
+  }, [token, dataScaned]);
 
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {

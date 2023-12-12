@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -63,8 +64,8 @@ export default function Profile(props) {
         dispatch(actions.setUserProfile(data));
       })
       .catch(error => {
-        console.log('error', error);
-        if (error) {
+        console.log('error', error.response.data.error);
+        if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
@@ -104,7 +105,15 @@ export default function Profile(props) {
         }
       })
       .catch(error => {
-        console.log('error', error);
+        console.log('error', error.response.data.error);
+        if (error.response.data.error === 'Token is expired') {
+          Alert.alert('', 'Logout Faild !', [
+            {
+              text: 'OK',
+              onPress: () => {},
+            },
+          ]);
+        }
       });
   };
   const [refreshing, setRefreshing] = React.useState(false);

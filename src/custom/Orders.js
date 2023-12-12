@@ -23,6 +23,7 @@ import moment from 'moment';
 import {actions} from '../redux/actions/actions';
 export default function Orders({navigation}) {
   const token = useSelector(state => state.reducer.userToken);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
   const allOrders1 = useSelector(state => state.reducer.allOrders);
   const [allorders2, setAllOrders2] = useState();
   const dispatch = useDispatch();
@@ -40,8 +41,8 @@ export default function Orders({navigation}) {
         dispatch(actions.setAllOrders(response?.data));
       })
       .catch(error => {
-        console.log('error', error);
-        if (error) {
+        console.log('error', error.response.data.error);
+        if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
@@ -51,7 +52,7 @@ export default function Orders({navigation}) {
 
   useEffect(() => {
     allOrders();
-  }, [token]);
+  }, [token, dataScaned]);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {

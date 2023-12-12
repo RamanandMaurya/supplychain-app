@@ -22,12 +22,6 @@ import {
 } from '../../utils/constant';
 import {width, height} from '../../dimension/dimension';
 import Geolocation from '@react-native-community/geolocation';
-import Permissions, {
-  check,
-  request,
-  PERMISSIONS,
-  RESULTS,
-} from 'react-native-permissions';
 import {useSelector, useDispatch} from 'react-redux';
 export default function Scanner(props) {
   const dataScaned = useSelector(state => state.reducer.dataScaned);
@@ -158,16 +152,11 @@ export default function Scanner(props) {
         );
       }
     } catch (error) {
-      if (error.response) {
-        console.error('API Error Status:', error.response.status);
-        console.error('API Error Data:', error.response.data);
-      } else if (error.request) {
-        console.error('API No Response:', error.request);
+      if (error.response.data.error === 'Token is expired') {
+        console.error('API No Response:', error.response.data.error);
         dispatch(actions.setUserToken(null));
         dispatch(actions.setLoginStatus(null));
         dispatch(actions.setUserInfo(null));
-      } else {
-        console.error('API Error Message:', error.message);
       }
     }
   };

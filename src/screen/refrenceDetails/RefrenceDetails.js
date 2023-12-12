@@ -23,6 +23,7 @@ import {useSelector, useDispatch} from 'react-redux';
 export default function RefrenceDetails({props, route, navigation}) {
   const {orderID, orderCount, orderTime, orderStatus} = route.params || {};
   const token = useSelector(state => state.reducer.userToken);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [qrStatusbyno, setQrStatusByNo] = useState([]);
   const [addressDetails, setAddressDetails] = useState('');
   const dispatch = useDispatch();
@@ -46,8 +47,8 @@ export default function RefrenceDetails({props, route, navigation}) {
         setAddressDetails(response.data.UserDetails);
       })
       .catch(error => {
-        console.log('apierror2', error);
-        if (error) {
+        console.log('apierror2-----------', error);
+        if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
@@ -57,7 +58,7 @@ export default function RefrenceDetails({props, route, navigation}) {
 
   useEffect(() => {
     allQrStatus();
-  }, []);
+  }, [token, dataScaned]);
   const openItemCount = qrStatusbyno.filter(
     item => item.order_status === 'open',
   ).length;

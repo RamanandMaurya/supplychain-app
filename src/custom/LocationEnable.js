@@ -1,9 +1,27 @@
 import * as React from 'react';
-import {StyleSheet, View, Button, Text} from 'react-native';
+import {useState, useEffect} from 'react';
+import {StyleSheet, View, Text, PermissionsAndroid} from 'react-native';
 export default function LocationEnable() {
+  const [PGranted, setPGranted] = useState();
+  useEffect(() => {
+    checkLocation();
+  }, []);
+  async function checkLocation() {
+    let granted = await getLocationPermission();
+    console.log(granted, '=> Permission');
+    setPGranted(granted);
+  }
+  async function getLocationPermission() {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    ).catch(err => {
+      console.log('location error', err);
+    });
+    return granted === PermissionsAndroid.RESULTS.GRANTED;
+  }
   return (
     <View style={styles.container}>
-      <Text>xdgfd</Text>
+      {PGranted ? <Text>location true</Text> : <Text>location no</Text>}
     </View>
   );
 }

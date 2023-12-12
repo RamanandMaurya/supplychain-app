@@ -48,7 +48,7 @@ export default function Home(props) {
         setRole(userProfile?.role);
       })
       .catch(error => {
-        console.log(error);
+        console.log(error.response.data.error);
         if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));

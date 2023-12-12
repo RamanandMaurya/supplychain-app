@@ -7,8 +7,6 @@ import AfterStack from './AfterStack';
 const Stack = createNativeStackNavigator();
 const RootStack = props => {
   const {loginStatus} = useSelector(state => state.reducer);
-  console.log('Login status------->>', loginStatus);
-
   return (
     <Stack.Navigator
       screenOptions={{

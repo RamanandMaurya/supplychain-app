@@ -11,16 +11,12 @@ import React from 'react';
 import {width} from '../dimension/dimension';
 import {imageConstant, colorConstant, fontConstant} from '../utils/constant';
 export default function ItemStatus(props) {
-  //console.log('@@@@', props?.openOrders[0]?.count);
-  //console.log('dashboardData============>////', props?.openOrders[0]);
+  console.log('@@@@', props?.openOrders);
   const data = [
     {
       id: '#01',
       title: 'OPEN',
-      count:
-        props?.openOrders[0]?.order_status === 'open'
-          ? props?.openOrders[0]?.count
-          : props?.openOrders[1]?.count,
+      count: props?.openOrders ? props?.openOrders[0]?.count : 0,
       discription: 'Deliveries',
       image: imageConstant.truck,
       color: colorConstant.green,
@@ -29,10 +25,7 @@ export default function ItemStatus(props) {
     {
       id: '#02',
       title: 'IN STOCK',
-      count:
-        props?.openOrders[0]?.order_status === 'in stock'
-          ? props?.openOrders[0]?.count
-          : 0,
+      count: props?.openOrders ? props?.openOrders[1]?.count : 0,
       discription: 'Deliveries',
       image: imageConstant.shop,
       color: colorConstant.green,
