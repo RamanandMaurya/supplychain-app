@@ -85,7 +85,7 @@ export default function Home(props) {
           <Image source={imageConstant.profile} style={styles.profileImg} />
           <View style={styles.columView}>
             <Text style={styles.titleText}>{name}</Text>
-            <Text style={(styles.subTitleText, styles.textTransformText)}>
+            <Text style={[styles.subTitleText, styles.textTransformText]}>
               {role}
             </Text>
           </View>
@@ -93,7 +93,8 @@ export default function Home(props) {
         <TouchableOpacity
           activeOpacity={0.7}
           //onPress={() => Alert.alert('Notification', 'Empty')}
-          onPress={() => props.navigation.navigate('Location')}>
+          //</View>onPress={() => props.navigation.navigate('Location')}
+        >
           <ImageBackground
             source={imageConstant.notification}
             style={styles.notification}>
