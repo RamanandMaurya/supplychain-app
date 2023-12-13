@@ -243,7 +243,8 @@ export default function Scanner(props) {
               <Text style={styles.viewText}>VIEW</Text>
             </TouchableOpacity>
           </View>
-          <View style={[styles.rowContainer1, {paddingTop: 5}]}>
+          <View
+            style={[styles.rowContainer1, {paddingTop: 5, paddingBottom: 8}]}>
             <View style={styles.leftColumnView}>
               <Text style={styles.refernceIdText}>#{qrdata}</Text>
               <View
@@ -261,7 +262,7 @@ export default function Scanner(props) {
                 <Text style={styles.scanItemText}>Updated 30 sec ago</Text>
               </View>
             </View>
-            <View style={styles.rightColumnView}>
+            <View style={[styles.rightColumnView, {paddingTop: 5}]}>
               <Image source={imageConstant.success} style={styles.scanImg} />
               <Text style={[styles.viewText, {color: colorConstant.green}]}>
                 Scanned
@@ -348,9 +349,8 @@ const styles = StyleSheet.create({
     width: width,
   },
   line: {
-    height: 0.5,
     width: width / 1.1,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     alignSelf: 'center',
     marginTop: width / 18,
     borderColor: colorConstant.line,
