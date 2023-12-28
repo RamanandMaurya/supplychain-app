@@ -59,6 +59,7 @@ export default function Open({navigation}) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      openOrderStatusinfo();
     }, 2000);
   }, []);
   return status ? (

@@ -255,8 +255,11 @@ export default function Scanner(props) {
                   },
                 ]}>
                 <Text
-                  style={[styles.scanItemText, {color: colorConstant.green}]}>
-                  Open
+                  style={[
+                    styles.scanItemText,
+                    {color: colorConstant.orange, textTransform: 'uppercase'},
+                  ]}>
+                  in stock
                 </Text>
                 <Image source={imageConstant.dot} style={styles.dotImg} />
                 <Text style={styles.scanItemText}>Updated 30 sec ago</Text>

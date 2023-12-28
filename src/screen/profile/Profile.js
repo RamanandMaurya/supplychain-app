@@ -52,7 +52,7 @@ export default function Profile(props) {
   const profileinfo = async () => {
     let url = `${baseUrl}/api/public/user/profile`;
     const AuthStr = 'Bearer '.concat(token);
-    console.log('@@@@@', token);
+    console.log('@@@@@---', token);
     axios
       .get(url, {
         headers: {
@@ -81,6 +81,11 @@ export default function Profile(props) {
     dispatch(actions.setUserToken(null));
     dispatch(actions.setLoginStatus(null));
     dispatch(actions.setUserInfo(null));
+    dispatch(actions.setUserProfile(null));
+    dispatch(actions.setDashboardData(null));
+    dispatch(actions.setOpenItems(null));
+    dispatch(actions.setInstockItems(null));
+    dispatch(actions.setAllOrders(null));
   };
 
   const logOut = async () => {
@@ -122,6 +127,7 @@ export default function Profile(props) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      profileinfo();
     }, 2000);
   }, []);
   return (

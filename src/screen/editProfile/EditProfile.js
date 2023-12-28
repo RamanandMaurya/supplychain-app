@@ -83,6 +83,7 @@ export default function EditProfile(props) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      profileinfo();
     }, 2000);
   }, []);
   return (

@@ -59,8 +59,16 @@ export default function Orders({navigation}) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      allOrders();
     }, 2000);
   }, []);
+  // const sortedOrders = [...allorders2].sort((a, b) => {
+  //   const dateA = new Date(a.created_at);
+  //   const dateB = new Date(b.created_at);
+
+  //   // Sort in descending order
+  //   return dateB - dateA;
+  // });
   return allorders2 ? (
     <FlatList
       style={{marginTop: 35}}

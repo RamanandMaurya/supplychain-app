@@ -59,13 +59,19 @@ export default function Home(props) {
   };
   useEffect(() => {
     homepageApi();
+    // Set up interval to fetch data every 5 seconds (adjust as needed)
+    const intervalId = setInterval(() => {
+      homepageApi();
+    }, 30000);
+    // Clear the interval on component unmount
+    return () => clearInterval(intervalId);
   }, [token, userProfile, dataScaned]);
   const [refreshing, setRefreshing] = React.useState(false);
-
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      homepageApi();
     }, 2000);
   }, []);
   return (
@@ -84,16 +90,16 @@ export default function Home(props) {
           onPress={() => props.navigation.navigate('Profile')}>
           <Image source={imageConstant.profile} style={styles.profileImg} />
           <View style={styles.columView}>
-            <Text style={styles.titleText}>{name}</Text>
+            <Text style={styles.titleText}>{name ? name : 'Name'}</Text>
             <Text style={[styles.subTitleText, styles.textTransformText]}>
-              {role}
+              {role ? role : 'Role'}
             </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
           //onPress={() => Alert.alert('Notification', 'Empty')}
-          //</View>onPress={() => props.navigation.navigate('Location')}
+          //onPress={() => props.navigation.navigate('Location')}
         >
           <ImageBackground
             source={imageConstant.notification}

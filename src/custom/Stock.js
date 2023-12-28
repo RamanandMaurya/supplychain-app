@@ -59,6 +59,7 @@ export default function Stock(props) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      inStockStatusinfo();
     }, 2000);
   }, []);
   return inStock ? (

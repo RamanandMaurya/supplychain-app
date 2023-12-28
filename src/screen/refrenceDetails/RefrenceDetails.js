@@ -67,6 +67,7 @@ export default function RefrenceDetails({props, route, navigation}) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
+      allQrStatus();
     }, 2000);
   }, []);
   return (

@@ -1,41 +1,38 @@
-import * as React from 'react';
-import {useState, useEffect} from 'react';
-import {StyleSheet, View, Text, PermissionsAndroid} from 'react-native';
-export default function LocationEnable() {
-  const [PGranted, setPGranted] = useState();
-  useEffect(() => {
-    checkLocation();
-  }, []);
-  async function checkLocation() {
-    let granted = await getLocationPermission();
-    console.log(granted, '=> Permission');
-    setPGranted(granted);
-  }
-  async function getLocationPermission() {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-    ).catch(err => {
-      console.log('location error', err);
-    });
-    return granted === PermissionsAndroid.RESULTS.GRANTED;
-  }
+import React from 'react';
+import {StyleSheet, View, Text, Button} from 'react-native';
+const LocationEnable = () => {
   return (
-    <View style={styles.container}>
-      {PGranted ? <Text>location true</Text> : <Text>location no</Text>}
+    <View>
+      <Text>Location</Text>
     </View>
   );
-}
+};
+
+const colors = {
+  red: '#b90707',
+  green: '#03b503',
+  blue: '#0000f7',
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center',
-    gap: 10,
+    flex: 1,
     justifyContent: 'center',
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  disabled: {
+    color: colors.red,
+  },
+  enabled: {
+    color: colors.green,
+  },
+  status: {
+    fontSize: 20,
+    margin: 20,
+  },
+  undefined: {
+    color: colors.blue,
   },
 });
+
+export default LocationEnable;
