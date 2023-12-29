@@ -27,8 +27,8 @@ export default function Scanner(props) {
   const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [scanned, setScanned] = useState(false);
   const [qrdata, setQrData] = useState('');
-  const [longitude, setLongitude] = useState(false);
-  const [latitude, setLatitude] = useState(false);
+  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('');
   const orderID = props.route.params.orderID;
   const token = useSelector(state => state.reducer.userToken);
   const dispatch = useDispatch();

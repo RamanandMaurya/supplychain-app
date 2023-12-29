@@ -7,11 +7,15 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {width} from '../dimension/dimension';
+import {useSelector} from 'react-redux';
 import {imageConstant, colorConstant, fontConstant} from '../utils/constant';
 export default function ItemStatus(props) {
-  console.log('@@@@', props?.openOrders);
+  const dashboardData = useSelector(state => state.reducer.dashboardData);
+
+  const countData = dashboardData?.Count;
+  //console.log('@@@@-----', countData);
   const data = [
     {
       id: '#01',
