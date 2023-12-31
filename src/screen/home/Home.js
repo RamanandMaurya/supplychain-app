@@ -22,16 +22,13 @@ import {actions} from '../../redux/actions/actions';
 import {width, height} from '../../dimension/dimension';
 import RecentOrders from '../../custom/RecentOrder';
 import ItemStatus from '../../custom/ItemStatus';
-import Profile from '../profile/Profile';
 
 export default function Home(props) {
   const token = useSelector(state => state.reducer.userToken);
   const userProfile = useSelector(state => state.reducer.userProfile);
   const dataScaned = useSelector(state => state.reducer.dataScaned);
   const dashboardData = useSelector(state => state.reducer.dashboardData);
-  const [name, setName] = useState();
-  const [role, setRole] = useState();
-  const [reloadProfile, setReloadProfile] = useState(false);
+  const userEdit = useSelector(state => state.reducer.userEdit);
   const dispatch = useDispatch();
   const homepageApi = async () => {
     let url = `${baseUrl}/api/public/user/order-count`;
@@ -44,39 +41,61 @@ export default function Home(props) {
       })
       .then(response => {
         dispatch(actions.setDashboardData(response?.data));
-        setName(userProfile?.name);
-        setRole(userProfile?.role);
       })
       .catch(error => {
-        console.log(error.response.data.error);
-        if (error.response.data.error === 'Token is expired') {
+        console.log(error?.response?.data?.error);
+        if (error?.response?.data?.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
         }
       });
-    setReloadProfile(true);
   };
+  const profileinfo = async () => {
+    let url = `${baseUrl}/api/public/user/profile`;
+    const AuthStr = 'Bearer '.concat(token);
+    console.log('@@@@@---', token);
+    axios
+      .get(url, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      })
+      .then(response => {
+        const data = response?.data;
+        dispatch(actions.setUserProfile(data));
+      })
+      .catch(error => {
+        console.log('error', error?.response?.data?.error);
+        if (error?.response?.data?.error === 'Token is expired') {
+          dispatch(actions.setUserToken(null));
+          dispatch(actions.setLoginStatus(null));
+          dispatch(actions.setUserInfo(null));
+        }
+      });
+  };
+
   useEffect(() => {
     homepageApi();
+    profileinfo();
     // Set up interval to fetch data every 5 seconds (adjust as needed)
     const intervalId = setInterval(() => {
       homepageApi();
     }, 30000);
     // Clear the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [token, userProfile, dataScaned]);
+  }, [token, dataScaned, userEdit]);
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
       homepageApi();
+      profileinfo();
     }, 2000);
   }, []);
   return (
     <SafeAreaView>
-      {reloadProfile && <Profile />}
       <View style={styles.mainView}>
         <TouchableOpacity
           activeOpacity={0.7}
@@ -90,15 +109,17 @@ export default function Home(props) {
           onPress={() => props.navigation.navigate('Profile')}>
           <Image source={imageConstant.profile} style={styles.profileImg} />
           <View style={styles.columView}>
-            <Text style={styles.titleText}>{name ? name : 'Name'}</Text>
+            <Text style={styles.titleText}>
+              {userProfile?.name ? userProfile?.name : 'Name'}
+            </Text>
             <Text style={[styles.subTitleText, styles.textTransformText]}>
-              {role ? role : 'Role'}
+              {userProfile?.role ? userProfile?.role : 'Role'}
             </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           activeOpacity={0.7}
-          //onPress={() => Alert.alert('Notification', 'Empty')}
+          //onPress={() => openLocationSettings()}
           //onPress={() => props.navigation.navigate('Location')}
         >
           <ImageBackground

@@ -1,25 +1,8 @@
-import {
-  ImageBackground,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
-import React, {useEffect} from 'react';
+import {SafeAreaView, StyleSheet, Text, View, Image} from 'react-native';
+import React from 'react';
 import {colorConstant, fontConstant, imageConstant} from '../../utils/constant';
 import {width} from '../../dimension/dimension';
-import {useSelector} from 'react-redux';
 export default function Splash(props) {
-  const token = useSelector(state => state.reducer.userToken);
-  useEffect(() => {
-    setTimeout(async () => {
-      if (token !== null) props.navigation.navigate('Home');
-      else props.navigation.navigate('Login');
-    }, 2000);
-  }, []);
-
   return (
     <SafeAreaView style={styles.main}>
       <Image source={imageConstant.logo} style={styles.image} />

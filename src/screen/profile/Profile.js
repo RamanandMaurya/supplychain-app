@@ -21,13 +21,11 @@ import {width} from '../../dimension/dimension';
 import {actions} from '../../redux/actions/actions';
 import {useDispatch, useSelector} from 'react-redux';
 import axios from 'axios';
-import {useEffect} from 'react';
 import * as ImagePicker from 'react-native-image-picker';
 
 export default function Profile(props) {
   const token = useSelector(state => state.reducer.userToken);
   const userProfile = useSelector(state => state.reducer.userProfile);
-  const userEdit = useSelector(state => state.reducer.userEdit);
   const [selectedImage, setSelectedImage] = useState();
   const dispatch = useDispatch();
   const openImagePicker = () => {
@@ -49,33 +47,6 @@ export default function Profile(props) {
       }
     });
   };
-  const profileinfo = async () => {
-    let url = `${baseUrl}/api/public/user/profile`;
-    const AuthStr = 'Bearer '.concat(token);
-    console.log('@@@@@---', token);
-    axios
-      .get(url, {
-        headers: {
-          Authorization: AuthStr,
-        },
-      })
-      .then(response => {
-        const data = response.data;
-        dispatch(actions.setUserProfile(data));
-      })
-      .catch(error => {
-        console.log('error', error.response.data.error);
-        if (error.response.data.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-        }
-      });
-  };
-  useEffect(() => {
-    profileinfo();
-  }, [userEdit]);
-
   //logoutapi//
   const logOutRemoveData = () => {
     dispatch(actions.setUserToken(null));
@@ -110,8 +81,8 @@ export default function Profile(props) {
         }
       })
       .catch(error => {
-        console.log('error', error.response.data.error);
-        if (error.response.data.error === 'Token is expired') {
+        console.log('error', error?.response?.data?.error);
+        if (error?.response?.data?.error === 'Token is expired') {
           Alert.alert('', 'Logout Faild !', [
             {
               text: 'OK',
@@ -127,7 +98,8 @@ export default function Profile(props) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-      profileinfo();
+      // profileinfo();
+      console.log('refresh-----');
     }, 2000);
   }, []);
   return (
