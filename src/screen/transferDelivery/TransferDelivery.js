@@ -29,8 +29,8 @@ export default function TransferDelivery(props) {
   const [data, setData] = useState();
   const adddata = useSelector(state => state.reducer.addDataForTransfer);
   const dataScaned = useSelector(state => state.reducer.dataScaned);
-  const [longitude, setLongitude] = useState(props?.route?.params?.lat);
-  const [latitude, setLatitude] = useState(props?.route?.params?.log);
+  const [longitude, setLongitude] = useState(props?.route?.params?.log);
+  const [latitude, setLatitude] = useState(props?.route?.params?.lat);
   const dispatch = useDispatch();
   const allUsers = async () => {
     let url = `${baseUrl}/api/public/user/all?role=retailer`;
@@ -67,8 +67,8 @@ export default function TransferDelivery(props) {
     let body = {
       product_id: adddata,
       ordered_by: checked,
-      lat: longitude.toString(),
-      lon: latitude.toString(),
+      lat: latitude.toString(),
+      lon: longitude.toString(),
     };
     try {
       const response = await axios.post(url, body, {
