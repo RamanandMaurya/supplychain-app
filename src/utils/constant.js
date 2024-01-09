@@ -31,7 +31,9 @@ import unlock from '../asset/image/unlock.png';
 import inStock from '../asset/image/inStock.png';
 import shopBag from '../asset/image/shopbag.png';
 import truckFast from '../asset/image/truckfast.png';
-
+import transferScan from '../asset/image/transferScan.png';
+import transferAdd from '../asset/image/transferAdd.png';
+import truckFastimg from '../asset/image/truckimg.png';
 const imageConstant = {
   unlock,
   scanVector,
@@ -66,6 +68,9 @@ const imageConstant = {
   inStock,
   shopBag,
   truckFast,
+  transferScan,
+  transferAdd,
+  truckFastimg,
 };
 
 const colorConstant = {

@@ -60,4 +60,22 @@ export const actions = {
       payload: {allOrders: allOrders},
     };
   },
+  setAddDataForTransfer: addDataForTransfer => {
+    return {
+      type: types.ADD_DATA_FOR_TRANSFER,
+      payload: {addDataForTransfer: addDataForTransfer},
+    };
+  },
+  setRemoveTransfer: removeTransfer => {
+    return {
+      type: types.REMOVE_TRANSFER,
+      payload: {addDataForTransfer: []},
+    };
+  },
+  setAllUsers: allUsers => {
+    return {
+      type: types.ALL_USERS,
+      payload: {allUsers: allUsers},
+    };
+  },
 };

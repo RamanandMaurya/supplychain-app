@@ -11,6 +11,9 @@ import RefrenceDetails from '../screen/refrenceDetails/RefrenceDetails';
 import Scanner from '../screen/scanner/Scanner';
 import EditProfile from '../screen/editProfile/EditProfile';
 import LocationEnable from '../custom/LocationEnable';
+import TransferScan from '../screen/transferScan/TransferScan';
+import Transfer from '../screen/transferItem/Transfer';
+import TransferredItems from '../screen/transferredItems/TransferredItems';
 const Stack = createNativeStackNavigator();
 
 const AfterStack = () => {
@@ -29,6 +32,9 @@ const AfterStack = () => {
       <Stack.Screen name="Scanner" component={Scanner} />
       <Stack.Screen name="EditProfile" component={EditProfile} />
       <Stack.Screen name="Location" component={LocationEnable} />
+      <Stack.Screen name="TransferScan" component={TransferScan} />
+      <Stack.Screen name="Transfer" component={Transfer} />
+      <Stack.Screen name="TransferredItems" component={TransferredItems} />
     </Stack.Navigator>
   );
 };

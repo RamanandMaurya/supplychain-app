@@ -6,42 +6,114 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
-import {colorConstant, fontConstant, imageConstant} from '../../utils/constant';
+import React, {useState, useEffect} from 'react';
+import {
+  colorConstant,
+  fontConstant,
+  imageConstant,
+  baseUrl,
+} from '../../utils/constant';
+import axios from 'axios';
 import Header from '../../custom/Header';
 import {width} from '../../dimension/dimension';
-
+import Button from '../../custom/Button';
+import {useSelector, useDispatch} from 'react-redux';
+import {actions} from '../../redux/actions/actions';
 export default function TransferDelivery(props) {
-  const [checked, setChecked] = useState(-1);
+  const [checked, setChecked] = useState();
+  const token = useSelector(state => state.reducer.userToken);
+  const allUsersData = useSelector(state => state.reducer.allUsers);
+  const [filterValue, setFilterValue] = useState('');
+  const [data, setData] = useState();
+  const adddata = useSelector(state => state.reducer.addDataForTransfer);
+  const dataScaned = useSelector(state => state.reducer.dataScaned);
+  const [longitude, setLongitude] = useState(props?.route?.params?.lat);
+  const [latitude, setLatitude] = useState(props?.route?.params?.log);
+  const dispatch = useDispatch();
+  const allUsers = async () => {
+    let url = `${baseUrl}/api/public/user/all?role=retailer`;
+    const AuthStr = 'Bearer '.concat(token);
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      });
+      console.log('all User Response ----', response?.data);
+      if (response?.data) {
+        setData(response?.data);
+        dispatch(actions.setAllUsers(response?.data));
+      }
+    } catch (error) {
+      console.log('all User Response =====', error);
+      if (error.response?.data.error === 'Token is expired') {
+        console.error('API No Response:', error.response?.data.error);
+        dispatch(actions.setUserToken(null));
+        dispatch(actions.setLoginStatus(null));
+        dispatch(actions.setUserInfo(null));
+        dispatch(actions.setAllUsers(null));
+        dispatch(actions.setAllUsers(null));
+      }
+    }
+  };
+  useEffect(() => {
+    allUsers();
+  }, [token]);
+  const transferDelivery = async () => {
+    let url = `${baseUrl}/api/public/order/placeorderintransfer`;
+    const AuthStr = 'Bearer '.concat(token);
+    let body = {
+      product_id: adddata,
+      ordered_by: checked,
+      lat: longitude.toString(),
+      lon: latitude.toString(),
+    };
+    try {
+      const response = await axios.post(url, body, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      });
+      console.log('Transfer Delivery Response ----', response?.data?.Message);
+      dispatch(actions.setDataScaned(dataScaned ? false : true));
+      if (response?.data) {
+        data
+          .filter(item => item.userId === checked)
+          .map((item, key) => {
+            props.navigation.navigate('TransferredItems', {
+              userName: item.name,
+              userEmail: item.email,
+            });
+          });
+      }
+    } catch (error) {
+      console.log('Transfer Delivery error =====', error?.response?.data);
+      if (error.response?.data.error === 'Token is expired') {
+        console.error('API No Response:', error.response?.data.error);
+        dispatch(actions.setUserToken(null));
+        dispatch(actions.setLoginStatus(null));
+        dispatch(actions.setUserInfo(null));
+        dispatch(actions.setAllUsers(null));
+        dispatch(actions.setAllUsers(null));
+      }
+    }
+  };
+  const transferredItems = () => {
+    transferDelivery();
+  };
 
-  const data = [
-    {
-      id: '#01',
-      title: 'Ramesh Kumar',
-      subTitle: 'rameshkumar123@gmail.com',
-    },
-    {
-      id: '#02',
-      title: 'Ramesh Kumar',
-      subTitle: 'rameshkumar123@gmail.com',
-    },
-    {
-      id: '#03',
-      title: 'Ramesh Kumar',
-      subTitle: 'rameshkumar123@gmail.com',
-    },
-    {
-      id: '#04',
-      title: 'Ramesh Kumar',
-      subTitle: 'rameshkumar123@gmail.com',
-    },
-    {
-      id: '#05',
-      title: 'Ramesh Kumar',
-      subTitle: 'rameshkumar123@gmail.com',
-    },
-  ];
+  const handleFilterChange = text => {
+    const inputValue = text.toLowerCase();
+    const filteredData = allUsersData.filter(
+      item =>
+        (item.name && item.name.toLowerCase().includes(inputValue)) ||
+        (item.email && item.email.toLowerCase().includes(inputValue)),
+    );
+    setData(filteredData);
+    setFilterValue(inputValue);
+  };
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header title={'Transfer Delivery'} navigation={props.navigation} />
@@ -49,40 +121,53 @@ export default function TransferDelivery(props) {
       <View style={styles.searchView}>
         <TextInput
           style={styles.input}
+          value={filterValue}
+          onChangeText={handleFilterChange}
           placeholder="Search Retailer"
           placeholderTextColor={colorConstant.lightBlackText}
         />
         <Image source={imageConstant.search} style={styles.searchImg} />
       </View>
 
-      {data.map((item, key) => {
-        return (
-          <View key={key}>
-            <View style={styles.rowContainer}>
-              <View style={styles.columView}>
-                <Text style={styles.titleText}>{item.title}</Text>
-                <Text style={styles.subText}>{item.subTitle}</Text>
+      <ScrollView style={{marginBottom: 80}}>
+        {data &&
+          data.map((item, key) => {
+            return (
+              <View key={key}>
+                <View style={styles.rowContainer}>
+                  <View style={styles.columView}>
+                    <Text style={styles.titleText}>{item.name}</Text>
+                    <Text style={styles.subText}>{item.email}</Text>
+                  </View>
+
+                  {checked === item.userId ? (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => setChecked(item.userId)}>
+                      <Image
+                        source={imageConstant.success}
+                        style={styles.img}
+                      />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => setChecked(item.userId)}>
+                      <Image source={imageConstant.round} style={styles.img} />
+                    </TouchableOpacity>
+                  )}
+                </View>
+                <View style={styles.line}></View>
               </View>
-
-              {checked == key ? (
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setChecked(1)}>
-                  <Image source={imageConstant.success} style={styles.img} />
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => setChecked(key)}>
-                  <Image source={imageConstant.round} style={styles.img} />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            <View style={styles.line}></View>
-          </View>
-        );
-      })}
+            );
+          })}
+      </ScrollView>
+      <Button
+        title={'Continue'}
+        position={'absolute'}
+        bottom={width / 20}
+        onButtonPress={transferredItems}
+      />
       {/* 
       <View style={styles.rowContainer}>
         <View style={styles.columView}>

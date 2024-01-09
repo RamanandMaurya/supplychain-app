@@ -13,48 +13,10 @@ import {useSelector} from 'react-redux';
 import {imageConstant, colorConstant, fontConstant} from '../utils/constant';
 export default function ItemStatus(props) {
   const dashboardData = useSelector(state => state.reducer.dashboardData);
-
+  const userInfo = useSelector(state => state.reducer.userInfo);
+  const roleData = userInfo?.userInfo?.role;
   const countData = dashboardData?.Count;
-  //console.log('@@@@-----', countData);
-  const data = [
-    {
-      id: '#01',
-      title: 'OPEN',
-      count: props?.openOrders ? props?.openOrders[0]?.count : 0,
-      discription: 'Deliveries',
-      image: imageConstant.truck,
-      color: colorConstant.green,
-      bgImage: imageConstant.truckFast,
-    },
-    {
-      id: '#02',
-      title: 'IN STOCK',
-      count: props?.openOrders ? props?.openOrders[1]?.count : 0,
-      discription: 'Deliveries',
-      image: imageConstant.shop,
-      color: colorConstant.green,
-      bgImage: imageConstant.inStock,
-    },
-    {
-      id: '#03',
-      title: 'IN TRANSFER',
-      count: 0,
-      discription: 'Deliveries',
-      image: imageConstant.truck,
-      color: colorConstant.green,
-      bgImage: imageConstant.truckFast,
-    },
-    {
-      id: '#04',
-      title: 'SOLD OUT',
-      count: 0,
-      discription: 'Deliveries',
-      image: imageConstant.shoppingBag,
-      color: colorConstant.green,
-      bgImage: imageConstant.shopBag,
-    },
-  ];
-
+  console.log('@@@@-----', countData);
   return (
     <ScrollView
       contentContainerStyle={{
@@ -64,59 +26,169 @@ export default function ItemStatus(props) {
         alignSelf: 'center',
         alignItems: 'center',
       }}>
-      {data.map((item, index) => {
-        return (
-          <View
-            key={index}
-            style={{
-              marginTop: width / 20,
-              marginLeft: width / 25,
-            }}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={styles.mapDataView}
-              onPress={
-                item.title === 'OPEN'
-                  ? props.OpenNavigation
-                  : item.title === 'IN STOCK'
-                  ? props.StockNavigation
-                  : item.title === 'IN TRANSFER'
-                  ? props.TransferNavigation
-                  : item.title === 'SOLD OUT'
-                  ? props.SoldoutNavigation
-                  : props.AllOrderNavigation
-              }>
-              <ImageBackground source={item.bgImage} resizeMode="contain">
-                <View style={styles.rowContainer}>
-                  <Text
-                    style={[
-                      styles.titleText,
-                      {
-                        color:
-                          item.title === 'OPEN'
-                            ? colorConstant.green
-                            : item.title === 'IN STOCK'
-                            ? colorConstant.orange
-                            : item.title === 'IN TRANSFER'
-                            ? colorConstant.blue
-                            : item.title === 'SOLD OUT'
-                            ? colorConstant.red
-                            : colorConstant.black,
-                      },
-                    ]}>
-                    {item.title}
-                  </Text>
-                  <Image source={item.image} style={styles.img} />
+      {roleData === 'retailer'
+        ? countData &&
+          countData
+            .filter((items, key) => key === 0 || key === 1)
+            .map((item, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    marginTop: width / 20,
+                    marginLeft: width / 25,
+                  }}>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.mapDataView}
+                    onPress={
+                      item.order_status === 'open'
+                        ? props.OpenNavigation
+                        : item.order_status === 'in stock'
+                        ? props.StockNavigation
+                        : item.order_status === 'in transfer'
+                        ? props.TransferNavigation
+                        : item.order_status === 'sold out'
+                        ? props.SoldoutNavigation
+                        : props.AllOrderNavigation
+                    }>
+                    <ImageBackground
+                      source={
+                        item.order_status === 'open'
+                          ? imageConstant.truckFast
+                          : item.order_status === 'in stock'
+                          ? imageConstant.inStock
+                          : item.order_status === 'in transfer'
+                          ? imageConstant.truckFast
+                          : item.order_status === 'sold out'
+                          ? imageConstant.shopBag
+                          : imageConstant.truckFast
+                      }
+                      resizeMode="contain">
+                      <View style={styles.rowContainer}>
+                        <Text
+                          style={[
+                            styles.titleText,
+                            {
+                              color:
+                                item.order_status === 'open'
+                                  ? colorConstant.green
+                                  : item.order_status === 'in stock'
+                                  ? colorConstant.orange
+                                  : item.order_status === 'in transfer'
+                                  ? colorConstant.blue
+                                  : item.order_status === 'sold out'
+                                  ? colorConstant.red
+                                  : colorConstant.black,
+                            },
+                          ]}>
+                          {item.order_status}
+                        </Text>
+                        <Image
+                          source={
+                            item.order_status === 'open'
+                              ? imageConstant.truck
+                              : item.order_status === 'in stock'
+                              ? imageConstant.shop
+                              : item.order_status === 'in transfer'
+                              ? imageConstant.truck
+                              : item.order_status === 'sold out'
+                              ? imageConstant.shoppingBag
+                              : imageConstant.truck
+                          }
+                          style={styles.img}
+                        />
+                      </View>
+                      <Text style={styles.countText}>{item.count}</Text>
+                      <Text
+                        style={[styles.subTitleText, {marginTop: width / 30}]}>
+                        Deliveries
+                      </Text>
+                    </ImageBackground>
+                  </TouchableOpacity>
                 </View>
-                <Text style={styles.countText}>{item.count}</Text>
-                <Text style={[styles.subTitleText, {marginTop: width / 30}]}>
-                  {item.discription}
-                </Text>
-              </ImageBackground>
-            </TouchableOpacity>
-          </View>
-        );
-      })}
+              );
+            })
+        : countData &&
+          countData.map((item, index) => {
+            return (
+              <View
+                key={index}
+                style={{
+                  marginTop: width / 20,
+                  marginLeft: width / 25,
+                }}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.mapDataView}
+                  onPress={
+                    item.order_status === 'open'
+                      ? props.OpenNavigation
+                      : item.order_status === 'in stock'
+                      ? props.StockNavigation
+                      : item.order_status === 'in transfer'
+                      ? props.TransferNavigation
+                      : item.order_status === 'sold out'
+                      ? props.SoldoutNavigation
+                      : props.AllOrderNavigation
+                  }>
+                  <ImageBackground
+                    source={
+                      item.order_status === 'open'
+                        ? imageConstant.truckFast
+                        : item.order_status === 'in stock'
+                        ? imageConstant.inStock
+                        : item.order_status === 'in transfer'
+                        ? imageConstant.truckFast
+                        : item.order_status === 'sold out'
+                        ? imageConstant.shopBag
+                        : imageConstant.truckFast
+                    }
+                    resizeMode="contain">
+                    <View style={styles.rowContainer}>
+                      <Text
+                        style={[
+                          styles.titleText,
+                          {
+                            color:
+                              item.order_status === 'open'
+                                ? colorConstant.green
+                                : item.order_status === 'in stock'
+                                ? colorConstant.orange
+                                : item.order_status === 'in transfer'
+                                ? colorConstant.blue
+                                : item.order_status === 'sold out'
+                                ? colorConstant.red
+                                : colorConstant.black,
+                          },
+                        ]}>
+                        {item.order_status}
+                      </Text>
+                      <Image
+                        source={
+                          item.order_status === 'open'
+                            ? imageConstant.truck
+                            : item.order_status === 'in stock'
+                            ? imageConstant.shop
+                            : item.order_status === 'in transfer'
+                            ? imageConstant.truck
+                            : item.order_status === 'sold out'
+                            ? imageConstant.shoppingBag
+                            : imageConstant.truck
+                        }
+                        style={styles.img}
+                      />
+                    </View>
+                    <Text style={styles.countText}>{item.count}</Text>
+                    <Text
+                      style={[styles.subTitleText, {marginTop: width / 30}]}>
+                      Deliveries
+                    </Text>
+                  </ImageBackground>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
     </ScrollView>
   );
 }
@@ -127,6 +199,7 @@ const styles = StyleSheet.create({
     fontFamily: fontConstant.medium,
     color: colorConstant.blackText,
     lineHeight: 21,
+    textTransform: 'uppercase',
   },
   mapDataView: {
     backgroundColor: 'white',

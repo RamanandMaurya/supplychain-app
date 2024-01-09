@@ -74,6 +74,7 @@ export default function EditProfile(props) {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };

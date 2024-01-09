@@ -26,6 +26,7 @@ import * as ImagePicker from 'react-native-image-picker';
 export default function Profile(props) {
   const token = useSelector(state => state.reducer.userToken);
   const userProfile = useSelector(state => state.reducer.userProfile);
+  const adddata = useSelector(state => state.reducer.addDataForTransfer);
   const [selectedImage, setSelectedImage] = useState();
   const dispatch = useDispatch();
   const openImagePicker = () => {
@@ -57,8 +58,9 @@ export default function Profile(props) {
     dispatch(actions.setOpenItems(null));
     dispatch(actions.setInstockItems(null));
     dispatch(actions.setAllOrders(null));
+    dispatch(actions.setAllUsers(null));
+    dispatch(actions.setRemoveTransfer());
   };
-
   const logOut = async () => {
     let url = `${baseUrl}/api/public/user/logout`;
     let body = {};

@@ -8,3 +8,6 @@ export const DASHBOARD_DATA = 'DASHBOARD_DATA';
 export const OPEN_ITEMS = 'OPEN_ITEMS';
 export const INSTOCK_ITEMS = 'INSTOCK_ITEMS';
 export const ALL_ORDERS = 'ALL_ORDERS';
+export const ADD_DATA_FOR_TRANSFER = 'ADD_DATA_FOR_TRANSFER';
+export const REMOVE_TRANSFER = 'REMOVE_TRANSFER';
+export const ALL_USERS = 'ALL_USERS';

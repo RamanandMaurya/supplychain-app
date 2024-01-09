@@ -26,10 +26,12 @@ import {useSelector, useDispatch} from 'react-redux';
 export default function Scanner(props) {
   const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [scanned, setScanned] = useState(false);
+  const [location, setLocation] = useState(false);
   const [qrdata, setQrData] = useState('');
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
   const orderID = props.route.params.orderID;
+  const orderCount = props.route.params.orderCount;
   const token = useSelector(state => state.reducer.userToken);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function Scanner(props) {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         {
-          title: 'Geolocation Permission',
+          title: 'Location Permission',
           message: 'Can we access your location?',
           buttonNeutral: 'Ask Me Later',
           buttonNegative: 'Cancel',
@@ -70,22 +72,37 @@ export default function Scanner(props) {
             console.log(position);
             setLongitude(position.coords.longitude);
             setLatitude(position.coords.latitude);
+            setLocation(true);
           },
           error => {
             console.log('## No location ##', error.code, error.message);
             setLongitude(false);
             setLatitude(false);
+            setLocation(false);
+            if (!location) {
+              Alert.alert('', 'Please turn on your location', [
+                {
+                  text: 'OK',
+                  //onPress: () => handleScanNext(),
+                },
+              ]);
+            }
           },
           //{enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
         );
       }
     });
   };
+  const onSuccess1 = async e => {
+    if (location) {
+      onSuccess(e);
+    }
+  };
   const onSuccess = async e => {
     try {
       if (e.bounds && e.data) {
         var resultArray = e.data.split(' ');
-        var resultString = resultArray[1].replace('Batch_No:', '').trim();
+        var resultString = resultArray[2].replace('Batch', '').trim();
         var resultToString = resultString.toString();
         setQrData(resultToString);
         sendApiRequest(resultToString);
@@ -108,6 +125,8 @@ export default function Scanner(props) {
       order_no: orderID,
       lon: longitude.toString(),
       lat: latitude.toString(),
+      //lon: '77.325493',
+      //lat: '28.582392',
     };
     try {
       const response = await axios.post(url, body, {
@@ -132,7 +151,7 @@ export default function Scanner(props) {
         setScanned(true);
       }
       if (response.data.message === 'Invalid QR Code') {
-        Alert.alert('', `This item does not exist in this order #${orderID}`, [
+        Alert.alert('', `This item does not exist in this order`, [
           {
             text: 'OK',
             onPress: () => handleScanNext(),
@@ -157,6 +176,7 @@ export default function Scanner(props) {
         dispatch(actions.setUserToken(null));
         dispatch(actions.setLoginStatus(null));
         dispatch(actions.setUserInfo(null));
+        dispatch(actions.setAllUsers(null));
       }
     }
   };
@@ -164,6 +184,7 @@ export default function Scanner(props) {
     setScanned(false);
     scannerNode.reactivate();
   };
+
   return (
     <SafeAreaView style={{flex: 1}}>
       <Header
@@ -172,7 +193,7 @@ export default function Scanner(props) {
         title={'Scan Delivery'}
       />
       <QRCodeScanner
-        onRead={onSuccess}
+        onRead={onSuccess1}
         showMarker={true}
         reactivate={false}
         ref={node => {
@@ -201,9 +222,9 @@ export default function Scanner(props) {
           <View style={styles.rowContainer}>
             <View style={styles.leftColumnView}>
               <View style={styles.underRowContainer}>
-                <Text style={styles.scanItemText}>Scan items</Text>
-                <Image source={imageConstant.dot} style={styles.dotImg} />
-                <Text style={styles.leftItemText}>Left 3 out of 5</Text>
+                <Text style={styles.scanItemText}>Scan item</Text>
+                {/* <Image source={imageConstant.dot} style={styles.dotImg} />
+                <Text style={styles.leftItemText}>Left 3 out of 5</Text> */}
               </View>
               <Text style={styles.subText}>
                 Order auto move to In Stock after all items are scanned
@@ -224,7 +245,9 @@ export default function Scanner(props) {
                 <Text style={styles.refernceIdText}>#{orderID}</Text>
               </View>
               <View style={styles.underRowContainer}>
-                <Text style={styles.scanItemText}>5 items</Text>
+                <Text style={styles.scanItemText}>
+                  {orderCount} {orderCount > 1 ? 'items' : 'item'}
+                </Text>
                 <Image source={imageConstant.dot} style={styles.dotImg} />
                 <Text style={styles.scanItemText}>1 hour ago</Text>
               </View>

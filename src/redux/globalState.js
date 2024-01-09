@@ -10,5 +10,7 @@ export default {
     openItems: null,
     instockItems: null,
     allOrders: null,
+    addDataForTransfer: [],
+    allUsers: null,
   },
 };

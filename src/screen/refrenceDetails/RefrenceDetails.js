@@ -52,6 +52,7 @@ export default function RefrenceDetails({props, route, navigation}) {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };
@@ -174,27 +175,12 @@ export default function RefrenceDetails({props, route, navigation}) {
               {addressDetails.shipping_address}
             </Text>
           </View>
-          <View
-            style={{
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}>
-            <Image source={imageConstant.location} style={styles.locationImg} />
-            <Text
-              style={[
-                styles.openText,
-                {color: colorConstant.button, marginTop: width / 80},
-              ]}>
-              TRACK
-            </Text>
-          </View>
         </View>
 
         <View style={styles.line}></View>
 
         {/* second view */}
-
-        {orderStatus != 'in stock' ? (
+        {orderStatus === 'open' ? (
           <View>
             <View style={[styles.rowContainer, {marginTop: width / 20}]}>
               <View style={styles.columView1}>
@@ -204,7 +190,7 @@ export default function RefrenceDetails({props, route, navigation}) {
                     alignItems: 'center',
                   }}>
                   <Text style={styles.text1}>
-                    Scan {orderCount > 1 ? 'items' : 'item'}{' '}
+                    Scan {orderCount > 1 ? 'items' : 'item'}
                   </Text>
                   <Image
                     style={[styles.imgDot, {marginTop: 3}]}
@@ -223,6 +209,7 @@ export default function RefrenceDetails({props, route, navigation}) {
                 onPress={() =>
                   navigation.navigate('Scanner', {
                     orderID: orderID,
+                    orderCount: orderCount,
                   })
                 }
                 style={{

@@ -42,11 +42,12 @@ export default function Stock(props) {
         dispatch(actions.setInstockItems(response?.data));
       })
       .catch(error => {
-        console.log('error', error.response.data.error);
+        console.log('error', error.response?.data.error);
         if (error.response.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };
@@ -60,8 +61,9 @@ export default function Stock(props) {
     setTimeout(() => {
       setRefreshing(false);
       inStockStatusinfo();
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>', dataScaned);
     }, 2000);
-  }, []);
+  }, [dataScaned]);
   return inStock ? (
     <FlatList
       style={{marginTop: 35}}
@@ -103,7 +105,7 @@ export default function Stock(props) {
                   <Text style={styles.subTitleText}> {createdAgo}</Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() =>
                   props.navigation.navigation.navigate('TransferDelivery')
@@ -112,7 +114,7 @@ export default function Stock(props) {
                   <Image source={imageConstant.truck} style={styles.img} />
                   <Text style={styles.text1}> TRANSFER</Text>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={styles.line}></View>
           </View>

@@ -37,15 +37,16 @@ export default function Orders({navigation}) {
         },
       })
       .then(response => {
-        setAllOrders2(response?.data);
+        //setAllOrders2(response?.data);
         dispatch(actions.setAllOrders(response?.data));
       })
       .catch(error => {
-        console.log('error', error.response.data.error);
-        if (error.response.data.error === 'Token is expired') {
+        console.log('error', error.response?.data.error);
+        if (error.response?.data.error === 'Token is expired') {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };
@@ -69,7 +70,7 @@ export default function Orders({navigation}) {
   //   // Sort in descending order
   //   return dateB - dateA;
   // });
-  return allorders2 ? (
+  return allOrders1 ? (
     <FlatList
       style={{marginTop: 35}}
       refreshControl={
@@ -80,7 +81,7 @@ export default function Orders({navigation}) {
           colors={['#A94545']}
         />
       }
-      data={allorders2}
+      data={allOrders1}
       renderItem={({item}) => {
         const createdAgo = moment(item.created_at).fromNow();
         return (

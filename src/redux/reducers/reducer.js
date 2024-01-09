@@ -60,6 +60,24 @@ export default function parentFlowReducer(
         ...state,
         allOrders: action.payload.allOrders,
       };
+    case types.ADD_DATA_FOR_TRANSFER:
+      return {
+        ...state,
+        addDataForTransfer: [
+          ...state.addDataForTransfer,
+          action.payload.addDataForTransfer,
+        ],
+      };
+    case types.REMOVE_TRANSFER:
+      return {
+        ...state,
+        addDataForTransfer: action.payload.addDataForTransfer,
+      };
+    case types.ALL_USERS:
+      return {
+        ...state,
+        allUsers: action.payload.allUsers,
+      };
 
     default:
       return state;

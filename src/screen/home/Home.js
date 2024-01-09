@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
+  Platform,
+  Linking,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
@@ -48,6 +50,7 @@ export default function Home(props) {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };
@@ -71,6 +74,7 @@ export default function Home(props) {
           dispatch(actions.setUserToken(null));
           dispatch(actions.setLoginStatus(null));
           dispatch(actions.setUserInfo(null));
+          dispatch(actions.setAllUsers(null));
         }
       });
   };
@@ -94,6 +98,18 @@ export default function Home(props) {
       profileinfo();
     }, 2000);
   }, []);
+  const openLocationSettings = () => {
+    const settingsUrl =
+      Platform.OS === 'ios' ? 'app-settings:' : 'location-settings';
+
+    Linking.openURL(settingsUrl)
+      .then(data => {
+        console.log('Settings opened:', data);
+      })
+      .catch(error => {
+        console.error('Error opening settings:', error);
+      });
+  };
   return (
     <SafeAreaView>
       <View style={styles.mainView}>
@@ -173,7 +189,7 @@ export default function Home(props) {
         <View style={{height: 50}}></View>
       </ScrollView>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         activeOpacity={0.7}
         onPress={() =>
           props.navigation.navigate('Scanner', {
@@ -182,7 +198,7 @@ export default function Home(props) {
         }
         style={styles.scannerButton}>
         <Image source={imageConstant.scanner} style={styles.scannerImg} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 }
