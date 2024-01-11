@@ -50,11 +50,7 @@ export default function TransferDelivery(props) {
       console.log('all User Response =====', error);
       if (error.response?.data.error === 'Token is expired') {
         console.error('API No Response:', error.response?.data.error);
-        dispatch(actions.setUserToken(null));
-        dispatch(actions.setLoginStatus(null));
-        dispatch(actions.setUserInfo(null));
-        dispatch(actions.setAllUsers(null));
-        dispatch(actions.setAllUsers(null));
+        props.navigation.navigate('Logout');
       }
     }
   };
@@ -92,11 +88,7 @@ export default function TransferDelivery(props) {
       console.log('Transfer Delivery error =====', error?.response?.data);
       if (error.response?.data.error === 'Token is expired') {
         console.error('API No Response:', error.response?.data.error);
-        dispatch(actions.setUserToken(null));
-        dispatch(actions.setLoginStatus(null));
-        dispatch(actions.setUserInfo(null));
-        dispatch(actions.setAllUsers(null));
-        dispatch(actions.setAllUsers(null));
+        props.navigation.navigate('Logout');
       }
     }
   };

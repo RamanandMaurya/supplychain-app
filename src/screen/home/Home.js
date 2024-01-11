@@ -47,10 +47,7 @@ export default function Home(props) {
       .catch(error => {
         console.log(error?.response?.data?.error);
         if (error?.response?.data?.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-          dispatch(actions.setAllUsers(null));
+          props.navigation.navigate('Logout');
         }
       });
   };
@@ -71,10 +68,7 @@ export default function Home(props) {
       .catch(error => {
         console.log('error', error?.response?.data?.error);
         if (error?.response?.data?.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-          dispatch(actions.setAllUsers(null));
+          props.navigation.navigate('Logout');
         }
       });
   };
@@ -98,18 +92,6 @@ export default function Home(props) {
       profileinfo();
     }, 2000);
   }, []);
-  const openLocationSettings = () => {
-    const settingsUrl =
-      Platform.OS === 'ios' ? 'app-settings:' : 'location-settings';
-
-    Linking.openURL(settingsUrl)
-      .then(data => {
-        console.log('Settings opened:', data);
-      })
-      .catch(error => {
-        console.error('Error opening settings:', error);
-      });
-  };
   return (
     <SafeAreaView>
       <View style={styles.mainView}>

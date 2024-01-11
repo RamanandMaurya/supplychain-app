@@ -114,10 +114,7 @@ export default function TransferScan(props) {
   //   } catch (error) {
   //     if (error.response.data.error === 'Token is expired') {
   //       console.error('API No Response:', error.response.data.error);
-  //       dispatch(actions.setUserToken(null));
-  //       dispatch(actions.setLoginStatus(null));
-  //       dispatch(actions.setUserInfo(null));
-  //       dispatch(actions.setAllUsers(null));
+  //       props.navigation.navigate('Logout');
   //     }
   //   }
   // };

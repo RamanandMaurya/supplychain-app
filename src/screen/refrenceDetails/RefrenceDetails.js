@@ -42,17 +42,14 @@ export default function RefrenceDetails({props, route, navigation}) {
         },
       })
       .then(response => {
-        console.log('@@qr', response.data.ProductData);
-        setQrStatusByNo(response.data.ProductData);
-        setAddressDetails(response.data.UserDetails);
+        console.log('@@qr', response?.data.ProductData);
+        setQrStatusByNo(response?.data.ProductData);
+        setAddressDetails(response?.data.UserDetails);
       })
       .catch(error => {
         console.log('apierror2-----------', error);
-        if (error.response.data.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-          dispatch(actions.setAllUsers(null));
+        if (error.response?.data.error === 'Token is expired') {
+          navigation.navigate('Logout');
         }
       });
   };

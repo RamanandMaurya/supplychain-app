@@ -71,10 +71,7 @@ export default function EditProfile(props) {
       .catch(error => {
         console.log('apierror', error.response.data.error); // Log the response data for more details
         if (error.response.data.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-          dispatch(actions.setAllUsers(null));
+          props.navigation.navigate('Logout');
         }
       });
   };

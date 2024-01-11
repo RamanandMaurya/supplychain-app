@@ -176,7 +176,9 @@ export default function Profile(props) {
           <Image source={imageConstant.arrow} style={styles.arrowImg} />
         </TouchableOpacity>
 
-        <TouchableOpacity activeOpacity={0.7} onPress={logOut}>
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => props.navigation.navigate('Logout')}>
           <Text
             style={[
               styles.text3,

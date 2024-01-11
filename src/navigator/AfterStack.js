@@ -14,6 +14,7 @@ import LocationEnable from '../custom/LocationEnable';
 import TransferScan from '../screen/transferScan/TransferScan';
 import Transfer from '../screen/transferItem/Transfer';
 import TransferredItems from '../screen/transferredItems/TransferredItems';
+import Logout from '../custom/Logout';
 const Stack = createNativeStackNavigator();
 
 const AfterStack = () => {
@@ -35,6 +36,7 @@ const AfterStack = () => {
       <Stack.Screen name="TransferScan" component={TransferScan} />
       <Stack.Screen name="Transfer" component={Transfer} />
       <Stack.Screen name="TransferredItems" component={TransferredItems} />
+      <Stack.Screen name="Logout" component={Logout} />
     </Stack.Navigator>
   );
 };

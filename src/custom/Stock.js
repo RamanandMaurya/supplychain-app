@@ -44,10 +44,7 @@ export default function Stock(props) {
       .catch(error => {
         console.log('error', error.response?.data.error);
         if (error.response.data.error === 'Token is expired') {
-          dispatch(actions.setUserToken(null));
-          dispatch(actions.setLoginStatus(null));
-          dispatch(actions.setUserInfo(null));
-          dispatch(actions.setAllUsers(null));
+          props.navigation.navigation.navigate('Logout');
         }
       });
   };
