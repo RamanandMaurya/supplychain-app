@@ -43,7 +43,7 @@ export default function Stock(props) {
       })
       .catch(error => {
         console.log('error', error.response?.data.error);
-        if (error.response.data.error === 'Token is expired') {
+        if (error.response?.data.error === 'Token is expired') {
           props.navigation.navigation.navigate('Logout');
         }
       });

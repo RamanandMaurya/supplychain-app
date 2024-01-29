@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   Image,
   View,
-  PermissionsAndroid,
   Alert,
 } from 'react-native';
 import React from 'react';
@@ -46,9 +45,9 @@ export default function TransferScan(props) {
         var resultString = resultArray[2].replace('Batch', '').trim();
         var resultToString = resultString.toString();
         setQrData(resultToString);
-        //(resultToString);
-        addData(resultToString);
-        setScanned(true);
+        sendApiRequest(resultToString);
+        //addData(resultToString);
+        //setScanned(true);
       }
     } catch (err) {
       console.error('Error setting scanned QR:', err);
@@ -60,64 +59,39 @@ export default function TransferScan(props) {
       ]);
     }
   };
-  // const sendApiRequest = async resultQrData => {
-  //   let url = `${baseUrl}/api/public/user/dealer-receive`;
-  //   const AuthStr = 'Bearer '.concat(token);
-  //   let body = {
-  //     qrdata: resultQrData,
-  //     //order_no: orderID,
-  //     lon: longitude.toString(),
-  //     lat: latitude.toString(),
-  //   };
-  //   try {
-  //     const response = await axios.post(url, body, {
-  //       headers: {
-  //         Authorization: AuthStr,
-  //       },
-  //     });
-  //     console.log('API Response Success:', response.data.message);
-  //     if (response.data.message === 'The Order is already is in stock') {
-  //       Alert.alert('', 'This order is already in stock', [
-  //         {
-  //           text: 'OK',
-  //           onPress: () => handleScanNext(),
-  //         },
-  //       ]);
-  //     }
-  //     if (
-  //       response.data.message ===
-  //       'The Order status is currently open and will change to in stock'
-  //     ) {
-  //       dispatch(actions.setDataScaned(dataScaned ? false : true));
-  //       setScanned(true);
-  //     }
-  //     if (response.data.message === 'Invalid QR Code') {
-  //       Alert.alert('', `This item does not exist in this order`, [
-  //         {
-  //           text: 'OK',
-  //           onPress: () => handleScanNext(),
-  //         },
-  //       ]);
-  //     }
-  //     if (response.data.message === undefined) {
-  //       Alert.alert(
-  //         '',
-  //         'QR code information mismatch with order. Please try again!',
-  //         [
-  //           {
-  //             text: 'OK',
-  //             onPress: () => handleScanNext(),
-  //           },
-  //         ],
-  //       );
-  //     }
-  //   } catch (error) {
-  //     if (error.response.data.error === 'Token is expired') {
-  //       console.error('API No Response:', error.response.data.error);
-  //       props.navigation.navigate('Logout');
-  //     }
-  //   }
-  // };
+  const sendApiRequest = async resultQrData => {
+    let url = `${baseUrl}/api/public/user/dealer/verify-product-in-stock?qrid=${resultQrData}`;
+    const AuthStr = 'Bearer '.concat(token);
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      });
+      console.log(
+        'API Response Success in-stock or not ++++++++++++++:',
+        response?.data.found,
+      );
+      if (response?.data?.found === true) {
+        addData(resultQrData);
+        dispatch(actions.setDataScaned(dataScaned ? false : true));
+      }
+      if (response?.data?.found === false) {
+        Alert.alert('', `This QR is not in Instock or Invalid`, [
+          {
+            text: 'OK',
+            onPress: () => handleScanNext(),
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error('scaned error', error);
+      if (error.response?.data.error === 'Token is expired') {
+        console.error('API No Response:', error.response?.data.error);
+        props.navigation.navigate('Logout');
+      }
+    }
+  };
   const handleScanNext = () => {
     setScanned(false);
     scannerNode.reactivate();
@@ -126,14 +100,15 @@ export default function TransferScan(props) {
   const addData = data => {
     const isDataAlreadyPresent = adddata.includes(data);
     if (isDataAlreadyPresent) {
-      Alert.alert('', `${data} already saved`, [
+      Alert.alert('', `This QR is already saved`, [
         {
           text: 'OK',
-          //onPress: () => handleScanNext(),
+          onPress: () => setScanned(true),
         },
       ]);
     } else {
       dispatch(actions.setAddDataForTransfer(data));
+      setScanned(true);
     }
   };
   return (
