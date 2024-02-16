@@ -99,6 +99,6 @@ const fontConstant = {
   regular: 'Lato-Regular',
 };
 
-const baseUrl = 'http://20.84.50.241:3005';
+const baseUrl = 'https://devapi-supplychain.jumbochain.org';
 
 export {imageConstant, colorConstant, fontConstant, baseUrl};

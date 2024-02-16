@@ -61,7 +61,7 @@ export default function Login(props) {
         }
       })
       .catch(error => {
-        console.log('doLogin ERROR', error?.response?.data);
+        console.log('doLogin ERROR network error', error);
         if (error?.response?.data?.error == 'email does not exist') {
           Alert.alert('', 'Email does not exist');
           return;

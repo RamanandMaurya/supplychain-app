@@ -66,6 +66,7 @@ export default function TransferDelivery(props) {
       lat: latitude.toString(),
       lon: longitude.toString(),
     };
+    console.log(body, 'tran------');
     try {
       const response = await axios.post(url, body, {
         headers: {

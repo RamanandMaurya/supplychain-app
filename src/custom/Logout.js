@@ -1,8 +1,10 @@
 import React, {useEffect} from 'react';
+import {ActivityIndicator, View, StyleSheet} from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
 import {actions} from '../redux/actions/actions';
 import axios from 'axios';
 import {baseUrl} from '../utils/constant';
+import {width, height} from '../dimension/dimension';
 export default function Logout(navigation) {
   const dispatch = useDispatch();
   const token = useSelector(state => state.reducer.userToken);
@@ -38,11 +40,24 @@ export default function Logout(navigation) {
         }
       })
       .catch(error => {
-        console.log('error', error?.response?.data?.error);
-        if (error?.response?.data?.error === 'Token is expired') {
-          logOutRemoveData();
-        }
+        console.log('error-new-----', error?.response?.data?.error);
+        logOutRemoveData();
+        // if (error?.response?.data?.error === 'Token is expired') {
+        //   logOutRemoveData();
+        // }
       });
   };
-  return <></>;
+  return (
+    <>
+      <View style={styles.activityIndicator}>
+        <ActivityIndicator size="large" color="#A94545" />
+      </View>
+    </>
+  );
 }
+
+const styles = StyleSheet.create({
+  activityIndicator: {
+    marginTop: height / 2.2,
+  },
+});
