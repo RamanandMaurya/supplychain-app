@@ -143,6 +143,15 @@ export default function Scanner(props) {
           },
         ]);
       }
+      if (response.data.message === 'disperency found') {
+        Alert.alert('', 'Disperency found', [
+          {
+            text: 'OK',
+            onPress: () => handleScanNext(),
+          },
+        ]);
+      }
+
       if (
         response.data.message ===
         'The Order status is currently open and will change to in stock'
@@ -171,6 +180,7 @@ export default function Scanner(props) {
         );
       }
     } catch (error) {
+      console.log('errr------', error);
       if (error.response.data.error === 'Token is expired') {
         console.error('API No Response:', error.response.data.error);
         props.navigation.navigate('Logout');
