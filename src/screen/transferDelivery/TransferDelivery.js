@@ -27,13 +27,22 @@ export default function TransferDelivery(props) {
   const allUsersData = useSelector(state => state.reducer.allUsers);
   const [filterValue, setFilterValue] = useState('');
   const [data, setData] = useState();
+  const userInfo = useSelector(state => state.reducer.userInfo);
   const adddata = useSelector(state => state.reducer.addDataForTransfer);
   const dataScaned = useSelector(state => state.reducer.dataScaned);
   const [longitude, setLongitude] = useState(props?.route?.params?.log);
   const [latitude, setLatitude] = useState(props?.route?.params?.lat);
   const dispatch = useDispatch();
   const allUsers = async () => {
-    let url = `${baseUrl}/api/public/user/all?role=retailer`;
+    console.log('userInfo=========', userInfo.userInfo.role);
+    let rolenew = '';
+    if (userInfo?.userInfo?.role === 'dealer') {
+      rolenew = 'distributor';
+    }
+    if (userInfo?.userInfo?.role === 'distributor') {
+      rolenew = 'retailer';
+    }
+    let url = `${baseUrl}/api/public/user/all?role=${rolenew}`;
     const AuthStr = 'Bearer '.concat(token);
     try {
       const response = await axios.get(url, {
@@ -116,7 +125,9 @@ export default function TransferDelivery(props) {
           style={styles.input}
           value={filterValue}
           onChangeText={handleFilterChange}
-          placeholder="Search Retailer"
+          placeholder={`Search ${
+            userInfo?.userInfo?.role === 'dealer' ? 'Distributor' : 'Retailer'
+          }`}
           placeholderTextColor={colorConstant.lightBlackText}
         />
         <Image source={imageConstant.search} style={styles.searchImg} />
