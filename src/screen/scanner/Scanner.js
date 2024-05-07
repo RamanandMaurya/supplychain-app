@@ -181,6 +181,14 @@ export default function Scanner(props) {
       }
     } catch (error) {
       console.log('errr------', error);
+      if (error) {
+        Alert.alert('', error?.response?.data?.error, [
+          {
+            text: 'OK',
+            onPress: () => props?.navigation.goBack(),
+          },
+        ]);
+      }
       if (error.response.data.error === 'Token is expired') {
         console.error('API No Response:', error.response.data.error);
         props.navigation.navigate('Logout');
