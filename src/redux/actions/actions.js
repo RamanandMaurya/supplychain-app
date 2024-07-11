@@ -78,4 +78,10 @@ export const actions = {
       payload: {allUsers: allUsers},
     };
   },
+  setAllOrdersDetail: allOrdersDetail => {
+    return {
+      type: types.ALL_ORDERS_DETAIL,
+      payload: {allOrdersDetail: allOrdersDetail},
+    };
+  },
 };

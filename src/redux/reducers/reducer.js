@@ -78,6 +78,11 @@ export default function parentFlowReducer(
         ...state,
         allUsers: action.payload.allUsers,
       };
+    case types.ALL_ORDERS_DETAIL:
+      return {
+        ...state,
+        allOrdersDetail: action.payload.allOrdersDetail,
+      };
 
     default:
       return state;

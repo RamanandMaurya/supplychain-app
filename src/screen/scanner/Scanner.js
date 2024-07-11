@@ -30,9 +30,11 @@ export default function Scanner(props) {
   const [qrdata, setQrData] = useState('');
   const [longitude, setLongitude] = useState('');
   const [latitude, setLatitude] = useState('');
+  const [orderIds, setOrderIds] = useState('');
   const orderID = props.route.params.orderID;
   const orderCount = props.route.params.orderCount;
   const token = useSelector(state => state.reducer.userToken);
+  const allOrdersDetail = useSelector(state => state.reducer.allOrdersDetail);
   const dispatch = useDispatch();
   useEffect(() => {
     getLocation();
@@ -105,7 +107,13 @@ export default function Scanner(props) {
         var resultString = resultArray[2].replace('Batch', '').trim();
         var resultToString = resultString.toString();
         setQrData(resultToString);
-        sendApiRequest(resultToString);
+        const filteredData = allOrdersDetail.filter(
+          item => item?.QRID === resultToString,
+        );
+        const orderNo = filteredData.map(item => item?.OrderNo);
+        const newOrderId = orderNo[0];
+        setOrderIds(newOrderId);
+        sendApiRequest(resultToString, newOrderId);
       }
     } catch (err) {
       console.error('Error setting scanned QR:', err);
@@ -117,12 +125,12 @@ export default function Scanner(props) {
       ]);
     }
   };
-  const sendApiRequest = async resultQrData => {
+  const sendApiRequest = async (resultQrData, orderno) => {
     let url = `${baseUrl}/api/public/user/dealer-receive`;
     const AuthStr = 'Bearer '.concat(token);
     let body = {
       qrdata: resultQrData,
-      order_no: orderID,
+      order_no: orderID ? orderID : orderno,
       lon: longitude.toString(),
       lat: latitude.toString(),
       //lon: '77.325493',
@@ -257,7 +265,9 @@ export default function Scanner(props) {
           <View style={styles.rowContainer1}>
             <View style={styles.leftColumnView}>
               <View>
-                <Text style={styles.refernceIdText}>#{orderID}</Text>
+                <Text style={styles.refernceIdText}>
+                  #{orderID ? orderID : orderIds}
+                </Text>
               </View>
               <View style={styles.underRowContainer}>
                 <Text style={styles.scanItemText}>
@@ -271,7 +281,7 @@ export default function Scanner(props) {
               activeOpacity={0.7}
               onPress={() =>
                 props.navigation.navigate('ItemDetails', {
-                  orderID: orderID,
+                  orderID: orderID ? orderID : orderIds,
                   Qrid: qrdata,
                   orderStatus: 'in stock',
                 })

@@ -12,5 +12,6 @@ export default {
     allOrders: null,
     addDataForTransfer: [],
     allUsers: null,
+    allOrdersDetail: null,
   },
 };

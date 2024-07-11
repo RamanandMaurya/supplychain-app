@@ -73,9 +73,31 @@ export default function Home(props) {
       });
   };
 
+  const allOdersDetail = async () => {
+    let url = `${baseUrl}/api/public/user/order-details`;
+    const AuthStr = 'Bearer '.concat(token);
+    axios
+      .get(url, {
+        headers: {
+          Authorization: AuthStr,
+        },
+      })
+      .then(response => {
+        const data = response?.data;
+        dispatch(actions.setAllOrdersDetail(data));
+      })
+      .catch(error => {
+        console.log('error', error?.response?.data?.error);
+        if (error?.response?.data?.error === 'Token is expired') {
+          props.navigation.navigate('Logout');
+        }
+      });
+  };
+
   useEffect(() => {
     homepageApi();
     profileinfo();
+    allOdersDetail();
     // Set up interval to fetch data every 5 seconds (adjust as needed)
     const intervalId = setInterval(() => {
       homepageApi();
@@ -171,16 +193,16 @@ export default function Home(props) {
         <View style={{height: 50}}></View>
       </ScrollView>
 
-      {/* <TouchableOpacity
+      <TouchableOpacity
         activeOpacity={0.7}
         onPress={() =>
           props.navigation.navigate('Scanner', {
-            orderID: 'ORD202311201644010963963658189',
+            orderID: '',
           })
         }
         style={styles.scannerButton}>
         <Image source={imageConstant.scanner} style={styles.scannerImg} />
-      </TouchableOpacity> */}
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -312,7 +334,7 @@ const styles = StyleSheet.create({
   scannerButton: {
     resizeMode: 'contain',
     position: 'absolute',
-    bottom: width / 4.7,
+    bottom: width / 4,
     alignSelf: 'center',
   },
   imgDot: {
